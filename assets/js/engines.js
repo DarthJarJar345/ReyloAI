@@ -22,8 +22,8 @@ export const ENGINES = [
 
 /** How long an engine stays parked after a failure kind (ms). */
 export const BLOCK_TTL = {
-  quota: 40 * 60 * 1000,
-  auth: 40 * 60 * 1000,
+  quota: 55 * 60 * 1000,
+  auth: 55 * 60 * 1000,
   engine: 6 * 60 * 1000,
   http: 6 * 60 * 1000,
   network: 90 * 1000,

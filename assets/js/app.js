@@ -129,6 +129,7 @@ const el = {
   errorRetry: $("#error-retry"),
   seedBadge: $("#seed-badge"),
   engineBadge: $("#engine-badge"),
+  quotaCountdown: $("#quota-countdown"),
   download: $("#download"),
   save: $("#save"),
   regen: $("#regen"),
@@ -732,6 +733,7 @@ async function generate() {
     }
     el.errorText.textContent = msg;
     setStage("error");
+    if (lastErr instanceof SpaceError && lastErr.kind === "quota") startQuotaCountdown();
     toast(msg, { kind: "error", timeout: 11000 });
     return;
   }
@@ -795,6 +797,34 @@ async function presentResult(result, settings) {
   } catch (err) {
     console.warn("gallery save failed", err);
   }
+}
+
+let countdownId = null;
+function startQuotaCountdown() {
+  if (countdownId) clearInterval(countdownId);
+  const quotaBlocks = Object.values(blocked).filter((b) => b.kind === "quota");
+  const target = quotaBlocks.length
+    ? Math.max(...quotaBlocks.map((b) => b.until))
+    : Date.now() + 55 * 60 * 1000;
+  el.quotaCountdown.hidden = false;
+  const tick = () => {
+    const left = target - Date.now();
+    if (left <= 0) {
+      clearInterval(countdownId);
+      countdownId = null;
+      blocked = {};
+      saveBlocked(blocked);
+      el.quotaCountdown.textContent =
+        "The free pool should be open again — hit Try again!";
+      return;
+    }
+    const m = Math.floor(left / 60000);
+    const sec = Math.floor((left % 60000) / 1000);
+    el.quotaCountdown.textContent =
+      `free pool refills in ~${m}m ${String(sec).padStart(2, "0")}s — retry re-arms itself`;
+  };
+  tick();
+  countdownId = setInterval(tick, 1000);
 }
 
 function capturePoster(videoUrl) {

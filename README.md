@@ -38,6 +38,28 @@ no subscription and no credit-card wall anywhere in the loop.
   your own free account if you ever need it.
 - Zero dependencies, zero build step, zero trackers. ~45 KB of hand-written JS.
 
+## ♾️ The engine fleet (why it feels unlimited)
+
+Free GPU pools limit anonymous use **per visitor IP**, not per site — and ZeroGPU's
+limit is platform-wide. Reylo AI therefore ships a **fleet** of independent free
+Gradio engines (`assets/js/engines.js`) and rotates them **in your browser**:
+
+1. each generation tries the fleet in order (last good engine first);
+2. payloads are mapped **adaptively** from each space's own `/config`
+   (components + labels), so any Gradio I2V space can join without hand-written
+   adapters (`discoverI2V` / `buildI2VPayload` in `gradio-client.js`);
+3. engines that quota-out, error, or sleep too long are **parked** in
+   `localStorage` with a per-failure TTL and un-park automatically;
+4. when every pool is parked, the UI shows a **live refill countdown** and
+   re-arms the retry button the moment the free window reopens;
+5. an optional personal HF token (stored only in your browser) upgrades you to
+   your own quota on top of the fleet.
+
+`tools/probe_fleet.py` (CI, `fleet.yml`) continuously re-validates the fleet:
+it discovers I2V spaces via the HF API, wakes sleeping ones patiently,
+exhausts the anonymous quota on one IP, then proves which engines still serve
+videos from that exhausted IP.
+
 ## 🧠 How it works
 
 ```
