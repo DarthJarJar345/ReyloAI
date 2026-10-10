@@ -159,6 +159,7 @@ export class GradioSpaceClient {
           name: c.props?.name || c.type || "",
           label: String(c.props?.label || c.props?.name || c.type || ""),
           comp: c.type,
+          def: c.props?.value ?? null,
           required: true,
         }));
         const apiName = d.api_name ? `/${String(d.api_name).replace(/^\/+/, "")}` : null;
@@ -195,7 +196,9 @@ export class GradioSpaceClient {
       else if (/width/.test(key)) out.push(settings.imageWidth || 832);
       else if (/height/.test(key)) out.push(settings.imageHeight || 480);
       else if (p.comp === "textbox" && /prompt|descri/.test(key)) out.push(settings.prompt);
-      else {
+      else if (p.def !== null && p.def !== undefined) {
+        out.push(p.def); // honour the engine's own default for exotic inputs
+      } else {
         if (p.required && p.comp !== "image") {
           throw new SpaceError(`Engine needs unsupported input "${p.label || p.name}".`, {
             kind: "engine",

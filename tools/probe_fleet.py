@@ -98,13 +98,38 @@ def host_of(sid):
     return f"https://{sid.replace('/', '-')}.hf.space"
 
 
+def runtime_of(sid):
+    try:
+        r = req(f"https://huggingface.co/api/spaces/{sid}?runtime=true", timeout=45)
+        rt = json.loads(r.read()).get("runtime") or {}
+        hw = (rt.get("hardware") or {}).get("current")
+        stage = rt.get("stage")
+        return f"{hw or stage or 'unknown'}"
+    except Exception:
+        return "?"
+
+
+def wake(host, budget_s=180):
+    """Patiently wait for a sleeping space to answer /config."""
+    t0 = time.time()
+    last = None
+    while time.time() - t0 < budget_s:
+        try:
+            return json.loads(req(host + "/config", timeout=60).read()), time.time() - t0
+        except Exception as e:
+            last = e
+            time.sleep(10)
+    print(f"      wake failed after {budget_s}s: {type(last).__name__}: {str(last)[:70]}")
+    return None, None
+
+
 def discover_i2v(host):
     """config-based discovery: (fn_index, params[(comp,label)]) or None."""
-    try:
-        cfg = json.loads(req(host + "/config", timeout=60).read())
-    except Exception as e:
-        print(f"      config fail: {type(e).__name__}: {str(e)[:80]}")
+    cfg, woke_in = wake(host)
+    if cfg is None:
         return None
+    if woke_in:
+        print(f"      woke in {woke_in:.0f}s")
     comps = {c.get("id"): c for c in cfg.get("components", [])}
     for i, d in enumerate(cfg.get("dependencies", [])):
         vis = d.get("api_visibility")
@@ -253,12 +278,16 @@ def main():
     engines = []
     for sid in discover_hosts():
         host = host_of(sid)
+        hw = runtime_of(sid)
         got = discover_i2v(host)
         if got:
             fn, params, ver = got
             engines.append((sid, host, fn, params))
-            print(f"  I2V  {sid}  fn={fn} gradio={ver} params={params}")
-        if len(engines) >= MAX_ALTS + 4:
+            print(f"  I2V  {sid}  hw={hw} fn={fn} gradio={ver}")
+            print(f"       params={params}")
+        else:
+            print(f"  --   {sid} hw={hw} (no usable i2v endpoint)")
+        if len(engines) >= MAX_ALTS + 3:
             break
     print(f"  discovered {len(engines)} i2v engines")
     if not engines:
