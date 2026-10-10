@@ -321,6 +321,7 @@ export class GradioSpaceClient {
               continue;
             }
             currentEvent = "message";
+            if (msg.event_id && msg.event_id !== eventId) continue; // other event's traffic
             if (onEvent) onEvent(msg);
 
             switch (msg.msg) {
@@ -355,13 +356,23 @@ export class GradioSpaceClient {
                 break;
               case "process_completed": {
                 const out = msg.output || {};
-                if (out.success === false) {
-                  throw new SpaceError(cleanErrorMessage(out.error) || "The engine reported an error.", {
-                    kind: "engine",
-                    detail: out.error,
-                  });
+                const data = out.data;
+                const empty =
+                  data === null ||
+                  data === undefined ||
+                  (Array.isArray(data) && data.length === 0);
+                if (out.success === false || empty) {
+                  const errText = cleanErrorMessage(out.error);
+                  const quotaish = /quota|limit|busy|too many|daily/i.test(errText || "");
+                  throw new SpaceError(
+                    errText ||
+                      (quotaish
+                        ? "The free shared GPU pool is temporarily exhausted."
+                        : "The engine finished without returning a video (transient ZeroGPU blip). An automatic retry usually succeeds."),
+                    { kind: quotaish ? "quota" : "engine", detail: out }
+                  );
                 }
-                return { data: out.data ?? [], raw: msg, event_id: msg.event_id };
+                return { data, raw: msg, event_id: msg.event_id };
               }
               case "unexpected_error":
                 throw new SpaceError(

@@ -597,11 +597,12 @@ async function generate() {
     s.randomize,
   ];
 
+  const MAX_ATTEMPTS = 3;
   let attempt = 0;
   let result = null;
   let lastErr = null;
 
-  while (attempt < 2 && !result) {
+  while (attempt < MAX_ATTEMPTS && !result) {
     attempt += 1;
     try {
       result = await client.predict({
@@ -613,12 +614,22 @@ async function generate() {
       });
     } catch (err) {
       lastErr = err;
+      const kind = err instanceof SpaceError ? err.kind : "unknown";
       const retryable =
-        err instanceof SpaceError && (err.kind === "sleeping" || err.kind === "network");
-      if (retryable && attempt < 2 && !state.abort.signal.aborted) {
-        el.statusMain.textContent = "Engine still waking up — retrying…";
-        el.statusSub.textContent = "cold starts on the free tier can take a minute";
-        await new Promise((r) => setTimeout(r, 8000));
+        err instanceof SpaceError &&
+        ["sleeping", "network", "engine"].includes(kind) &&
+        attempt < MAX_ATTEMPTS &&
+        !state.abort.signal.aborted;
+      if (retryable) {
+        const wait = 5000 * attempt;
+        el.statusMain.textContent = `Attempt ${attempt} didn't return a video — retrying in ${Math.round(wait / 1000)}s…`;
+        el.statusSub.textContent =
+          kind === "sleeping"
+            ? "cold starts on the free tier can take a minute"
+            : "transient ZeroGPU blips are normal; the retry usually succeeds";
+        setProgress(null);
+        await new Promise((r) => setTimeout(r, wait));
+        state.session = newSessionHash();
         continue;
       }
       break;
@@ -637,10 +648,14 @@ async function generate() {
       toast("Generation cancelled.", { kind: "info" });
       return;
     }
-    const msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
+    let msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
+    if (lastErr instanceof SpaceError && lastErr.kind === "quota") {
+      msg +=
+        " Tip: the free pool resets after a while — or paste your own free Hugging Face token under Advanced settings to use your personal quota.";
+    }
     el.errorText.textContent = msg;
     setStage("error");
-    toast(msg, { kind: "error", timeout: 9000 });
+    toast(msg, { kind: "error", timeout: 11000 });
     return;
   }
 
