@@ -109,7 +109,7 @@ def runtime_of(sid):
         return "?"
 
 
-def wake(host, budget_s=180):
+def wake(host, budget_s=120):
     """Patiently wait for a sleeping space to answer /config."""
     t0 = time.time()
     last = None
@@ -123,9 +123,9 @@ def wake(host, budget_s=180):
     return None, None
 
 
-def discover_i2v(host):
+def discover_i2v(sid):
     """config-based discovery: (fn_index, params[(comp,label)]) or None."""
-    cfg, woke_in = wake(host)
+    cfg, woke_in = wake(host_of(sid), 120)
     if cfg is None:
         return None
     if woke_in:
@@ -252,6 +252,9 @@ def try_generation(host, fn_index, params, png, timeout_sse=SSE_TIMEOUT):
     return verdict, detail
 
 
+DISCOVERY_DEADLINE = 0.0
+
+
 def discover_hosts():
     sids = list(KNOWN)
     for q in SEARCHES:
@@ -273,16 +276,20 @@ def discover_hosts():
 
 
 def main():
+    global DISCOVERY_DEADLINE
     png = make_png()
-    hr("1) discover I2V engines via /config")
+    hr("1) discover I2V engines via /config (hardware-prefiltered)")
+    DISCOVERY_DEADLINE = time.time() + 420
     engines = []
     for sid in discover_hosts():
-        host = host_of(sid)
+        if time.time() > DISCOVERY_DEADLINE:
+            print("  discovery budget spent, stopping")
+            break
         hw = runtime_of(sid)
-        got = discover_i2v(host)
+        got = discover_i2v(sid)
         if got:
             fn, params, ver = got
-            engines.append((sid, host, fn, params))
+            engines.append((sid, host_of(sid), fn, params))
             print(f"  I2V  {sid}  hw={hw} fn={fn} gradio={ver}")
             print(f"       params={params}")
         else:

@@ -31,7 +31,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          python3 tools/probe_fleet.py 2>&1 | tee fleet.log
+          python3 -u tools/probe_fleet.py 2>&1 | tee fleet.log
 
       - name: Publish fleet report
         if: always()
