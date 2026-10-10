@@ -1,0 +1,83 @@
+Space : https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space
+Origin: https://darthjarjar345.github.io
+Gens  : 4
+
+==============================================================================
+### 0) Public mirror content-type check (which URL is a REAL website?)
+==============================================================================
+  jsdelivr       HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
+  jsdelivr-css   HTTP 200  content-type='text/css; charset=utf-8'  -> NOT-HTML
+      first bytes: b'/* ================================================================\n   Reylo AI Video Generator \xe2\x80\x94 design system\n   dee'
+  statically     HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
+  githack        HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE
+  gh-raw         HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
+
+==============================================================================
+### 1) GET config (anonymous, browser Origin)
+==============================================================================
+  /gradio_api/config -> HTTP 404
+  config served at: /config
+  HTTP 200  api_prefix='/gradio_api' -> '/gradio_api'  protocol='sse_v3'  gradio=6.1.0
+  auth_required=None  space_id=zerogpu-aoti/wan2-2-fp8da-aoti-faster
+  access-control-allow-credentials: true
+  access-control-allow-origin: https://darthjarjar345.github.io
+  access-control-expose-headers: *
+    dep[0] api_name='generate_video' queue=True
+    dep[1] api_name='load_example_input' queue=False
+    dep[2] api_name='load_example' queue=True
+
+==============================================================================
+### 2) GET /gradio_api/info
+==============================================================================
+  HTTP 200  endpoints=['/generate_video']
+    /generate_video: visibility=public params=['input_image', 'prompt', 'steps', 'negative_prompt', 'duration_seconds', 'guidance_scale', 'guidance_scale_2', 'seed', 'randomize_seed']
+
+==============================================================================
+### 3) CORS preflights (queue/join + upload)
+==============================================================================
+  OPTIONS /queue/join -> HTTP 200  allow-origin='https://darthjarjar345.github.io'
+  OPTIONS /upload?upload_id=probe -> HTTP 200  allow-origin='https://darthjarjar345.github.io'
+
+==============================================================================
+### 4) 4 consecutive anonymous generations
+==============================================================================
+  gen#1: joined event_id=a79ca89a368e4d41b4b46bec4a701819
+    [  0.3s] estimation rank=0 eta=49.713273360327825
+    [  0.3s] process_starts rank=None eta=49.713273360327825
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#1: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "a79ca89a368e4d41b4b46bec4a701819", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+  gen#2: joined event_id=86e4d6fbbe094ad09716755fdd279cca
+    [  0.3s] estimation rank=0 eta=49.713273360327825
+    [  0.3s] process_starts rank=None eta=49.713273360327825
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#2: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "86e4d6fbbe094ad09716755fdd279cca", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+  gen#3: joined event_id=43f48cc5fd89451596909badf318860a
+    [  0.3s] estimation rank=0 eta=49.713273360327825
+    [  0.3s] process_starts rank=None eta=49.713273360327825
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#3: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "43f48cc5fd89451596909badf318860a", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+  gen#4: joined event_id=ba2849af982f40bca90f234ad15b1daa
+    [  0.3s] estimation rank=0 eta=49.713273360327825
+    [  0.3s] process_starts rank=None eta=49.713273360327825
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#4: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "ba2849af982f40bca90f234ad15b1daa", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+
+  generations succeeded: 0/4
+
+==============================================================================
+### SUMMARY
+==============================================================================
+FAILURES:
+  - jsdelivr serves index.html as non-HTML
+  - gen#1 completed without video url
+  - gen#2 completed without video url
+  - gen#3 completed without video url
+  - gen#4 completed without video url
+  - only 0/4 generations succeeded

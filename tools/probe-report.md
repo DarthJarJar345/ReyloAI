@@ -1,191 +1,92 @@
 # Space API probe report
 
-- run: 38084734041 / attempt 1
+- run: 38089675397 / attempt 1
 - ref: arena/50b14632-reyloai
-- sha: cf70cc3b0e7a21ab26bc5157fc5fd2fdfda7bc68
-- utc: 2026-10-10T20:41:53Z
+- sha: de1f4babd007ba2898cf0692eec92def9c20846b
+- utc: 2026-10-10T21:59:17Z
 
 ```text
 Space : https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space
 Origin: https://darthjarjar345.github.io
+Gens  : 4
 
 ==============================================================================
-### 1) GET /gradio_api/config  (anonymous, with browser Origin)
+### 0) Public mirror content-type check (which URL is a REAL website?)
+==============================================================================
+  jsdelivr       HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
+  jsdelivr-css   HTTP 200  content-type='text/css; charset=utf-8'  -> NOT-HTML
+      first bytes: b'/* ================================================================\n   Reylo AI Video Generator \xe2\x80\x94 design system\n   dee'
+  statically     HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
+  githack        HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE
+  gh-raw         HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
+
+==============================================================================
+### 1) GET config (anonymous, browser Origin)
 ==============================================================================
   /gradio_api/config -> HTTP 404
   config served at: /config
-  HTTP 200  in 0.7s
-  api_prefix     : '/gradio_api' -> using '/gradio_api'
-  protocol       : 'sse_v3'
-  connect_heartbeat: False
-  space_id       : 'zerogpu-aoti/wan2-2-fp8da-aoti-faster'
+  HTTP 200  api_prefix='/gradio_api' -> '/gradio_api'  protocol='sse_v3'  gradio=6.1.0
+  auth_required=None  space_id=zerogpu-aoti/wan2-2-fp8da-aoti-faster
   access-control-allow-credentials: true
   access-control-allow-origin: https://darthjarjar345.github.io
   access-control-expose-headers: *
-  gradio version : 6.1.0
-  auth_required  : None
-  auth_message   : None
-  enable_queue   : True
-  max_file_size: None
-  #dependencies  : 3
-    [0] api_name='generate_video' inputs=9 outputs=2 queue=True
-    [1] api_name='load_example_input' inputs=1 outputs=3 queue=False
-    [2] api_name='load_example' inputs=1 outputs=2 queue=True
+    dep[0] api_name='generate_video' queue=True
+    dep[1] api_name='load_example_input' queue=False
+    dep[2] api_name='load_example' queue=True
 
 ==============================================================================
-### 2) GET /gradio_api/info  (named endpoints)
+### 2) GET /gradio_api/info
 ==============================================================================
-  HTTP 200  endpoints: ['/generate_video']
-    /generate_video
-      params: ['input_image', 'prompt', 'steps', 'negative_prompt', 'duration_seconds', 'guidance_scale', 'guidance_scale_2', 'seed', 'randomize_seed']
-      returns: ['Generated Video', 'Seed']
-      api_visibility: public
+  HTTP 200  endpoints=['/generate_video']
+    /generate_video: visibility=public params=['input_image', 'prompt', 'steps', 'negative_prompt', 'duration_seconds', 'guidance_scale', 'guidance_scale_2', 'seed', 'randomize_seed']
 
 ==============================================================================
-### 3) CORS preflight OPTIONS /gradio_api/queue/join
+### 3) CORS preflights (queue/join + upload)
 ==============================================================================
-  HTTP 200
-  access-control-allow-methods: POST
-  access-control-allow-headers: content-type
-  access-control-max-age: 600
-  access-control-allow-origin: https://darthjarjar345.github.io
+  OPTIONS /queue/join -> HTTP 200  allow-origin='https://darthjarjar345.github.io'
+  OPTIONS /upload?upload_id=probe -> HTTP 200  allow-origin='https://darthjarjar345.github.io'
 
 ==============================================================================
-### 3b) CORS preflight OPTIONS /gradio_api/upload
+### 4) 4 consecutive anonymous generations
 ==============================================================================
-  HTTP 200
-  access-control-allow-methods: POST
-  access-control-allow-headers: content-type
-  access-control-max-age: 600
-  access-control-allow-origin: https://darthjarjar345.github.io
+  gen#1: joined event_id=a79ca89a368e4d41b4b46bec4a701819
+    [  0.3s] estimation rank=0 eta=49.713273360327825
+    [  0.3s] process_starts rank=None eta=49.713273360327825
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#1: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "a79ca89a368e4d41b4b46bec4a701819", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+  gen#2: joined event_id=86e4d6fbbe094ad09716755fdd279cca
+    [  0.3s] estimation rank=0 eta=49.713273360327825
+    [  0.3s] process_starts rank=None eta=49.713273360327825
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#2: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "86e4d6fbbe094ad09716755fdd279cca", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+  gen#3: joined event_id=43f48cc5fd89451596909badf318860a
+    [  0.3s] estimation rank=0 eta=49.713273360327825
+    [  0.3s] process_starts rank=None eta=49.713273360327825
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#3: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "43f48cc5fd89451596909badf318860a", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+  gen#4: joined event_id=ba2849af982f40bca90f234ad15b1daa
+    [  0.3s] estimation rank=0 eta=49.713273360327825
+    [  0.3s] process_starts rank=None eta=49.713273360327825
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#4: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "ba2849af982f40bca90f234ad15b1daa", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
 
-==============================================================================
-### 4) Anonymous end-to-end generation via /queue/join + SSE /queue/data
-==============================================================================
-  test image: 2335 bytes 512x288
-    dep[0] api_name='generate_video'
-    dep[1] api_name='load_example_input'
-    dep[2] api_name='load_example'
-  using fn_index = 0
-  queue/join -> HTTP 200 in 0.3s
-  access-control-allow-credentials: true
-  access-control-allow-origin: https://darthjarjar345.github.io
-  access-control-expose-headers: *
-  body: {"event_id":"ce31584e2e3d400eadb7eed90bab8f6e"}
-
-  listening on SSE /queue/data?session_hash=8db020518da74018 ...
-  access-control-allow-credentials: true
-  access-control-allow-origin: https://darthjarjar345.github.io
-  access-control-expose-headers: *
-    [   0.5s] event=None {"msg": "estimation", "event_id": "ce31584e2e3d400eadb7eed90bab8f6e", "rank": 0, "queue_size": 1, "rank_eta": 47.682995446026325}
-    [   0.5s] event=None {"msg": "process_starts", "event_id": "ce31584e2e3d400eadb7eed90bab8f6e", "eta": 47.682995446026325}
-    [   1.0s] progress 10/100 desc=ZeroGPU init
-    [   1.3s] progress 20/100 desc=ZeroGPU init
-    [   1.5s] progress 21/100 desc=ZeroGPU init
-    [   1.5s] progress 22/100 desc=ZeroGPU init
-    [   1.6s] progress 23/100 desc=ZeroGPU init
-    [   1.7s] progress 24/100 desc=ZeroGPU init
-    [   1.8s] progress 25/100 desc=ZeroGPU init
-    [   1.9s] progress 26/100 desc=ZeroGPU init
-    [   2.2s] progress 27/100 desc=ZeroGPU init
-    [   2.5s] progress 28/100 desc=ZeroGPU init
-    [   2.5s] progress 29/100 desc=ZeroGPU init
-    [   2.5s] progress 30/100 desc=ZeroGPU init
-    [   2.5s] progress 31/100 desc=ZeroGPU init
-    [   2.6s] progress 32/100 desc=ZeroGPU init
-    [   2.6s] progress 33/100 desc=ZeroGPU init
-    [   2.6s] progress 34/100 desc=ZeroGPU init
-    [   2.6s] progress 35/100 desc=ZeroGPU init
-    [   2.7s] progress 36/100 desc=ZeroGPU init
-    [   2.7s] progress 37/100 desc=ZeroGPU init
-    [   2.7s] progress 38/100 desc=ZeroGPU init
-    [   2.8s] progress 39/100 desc=ZeroGPU init
-    [   2.8s] progress 40/100 desc=ZeroGPU init
-    [   2.8s] progress 41/100 desc=ZeroGPU init
-    [   2.9s] progress 42/100 desc=ZeroGPU init
-    [   3.0s] progress 43/100 desc=ZeroGPU init
-    [   3.0s] progress 44/100 desc=ZeroGPU init
-    [   3.1s] progress 45/100 desc=ZeroGPU init
-    [   3.1s] progress 46/100 desc=ZeroGPU init
-    [   3.1s] progress 47/100 desc=ZeroGPU init
-    [   3.1s] progress 48/100 desc=ZeroGPU init
-    [   3.2s] progress 49/100 desc=ZeroGPU init
-    [   3.2s] progress 50/100 desc=ZeroGPU init
-    [   3.3s] progress 51/100 desc=ZeroGPU init
-    [   3.3s] progress 52/100 desc=ZeroGPU init
-    [   3.4s] progress 53/100 desc=ZeroGPU init
-    [   3.4s] progress 54/100 desc=ZeroGPU init
-    [   3.5s] progress 55/100 desc=ZeroGPU init
-    [   3.5s] progress 56/100 desc=ZeroGPU init
-    [   3.6s] progress 57/100 desc=ZeroGPU init
-    [   3.6s] progress 58/100 desc=ZeroGPU init
-    [   3.7s] progress 59/100 desc=ZeroGPU init
-    [   3.7s] progress 60/100 desc=ZeroGPU init
-    [   3.8s] progress 61/100 desc=ZeroGPU init
-    [   3.8s] progress 62/100 desc=ZeroGPU init
-    [   3.9s] progress 63/100 desc=ZeroGPU init
-    [   3.9s] progress 64/100 desc=ZeroGPU init
-    [   3.9s] progress 65/100 desc=ZeroGPU init
-    [   4.0s] progress 66/100 desc=ZeroGPU init
-    [   4.0s] progress 67/100 desc=ZeroGPU init
-    [   4.0s] progress 68/100 desc=ZeroGPU init
-    [   4.1s] progress 69/100 desc=ZeroGPU init
-    [   4.1s] progress 70/100 desc=ZeroGPU init
-    [   4.2s] progress 71/100 desc=ZeroGPU init
-    [   4.2s] progress 72/100 desc=ZeroGPU init
-    [   4.3s] progress 73/100 desc=ZeroGPU init
-    [   4.3s] progress 74/100 desc=ZeroGPU init
-    [   4.4s] progress 75/100 desc=ZeroGPU init
-    [   4.4s] progress 76/100 desc=ZeroGPU init
-    [   4.5s] progress 77/100 desc=ZeroGPU init
-    [   4.6s] progress 78/100 desc=ZeroGPU init
-    [   4.8s] progress 79/100 desc=ZeroGPU init
-    [   5.1s] progress 80/100 desc=ZeroGPU init
-    [   5.4s] progress 81/100 desc=ZeroGPU init
-    [   5.4s] progress 82/100 desc=ZeroGPU init
-    [   5.4s] progress 83/100 desc=ZeroGPU init
-    [   5.5s] progress 84/100 desc=ZeroGPU init
-    [   5.5s] progress 85/100 desc=ZeroGPU init
-    [   5.6s] progress 86/100 desc=ZeroGPU init
-    [   5.6s] progress 87/100 desc=ZeroGPU init
-    [   5.6s] progress 88/100 desc=ZeroGPU init
-    [   5.6s] progress 89/100 desc=ZeroGPU init
-    [   5.7s] progress 90/100 desc=ZeroGPU init
-    [   5.7s] progress 91/100 desc=ZeroGPU init
-    [   5.7s] progress 92/100 desc=ZeroGPU init
-    [   5.7s] progress 93/100 desc=ZeroGPU init
-    [   5.8s] progress 94/100 desc=ZeroGPU init
-    [   5.8s] progress 95/100 desc=ZeroGPU init
-    [   5.9s] progress 96/100 desc=ZeroGPU init
-    [   5.9s] progress 97/100 desc=ZeroGPU init
-    [   5.9s] progress 98/100 desc=ZeroGPU init
-    [   6.0s] progress 99/100 desc=ZeroGPU init
-    [   6.0s] progress 100/100 desc=ZeroGPU init
-    [   6.0s] progress None/? desc=None
-    [   7.1s] progress 0/4 desc=None
-    [   7.8s] progress 1/4 desc=None
-    [   8.3s] progress 2/4 desc=None
-    [   8.9s] progress 3/4 desc=None
-    [   9.5s] progress None/? desc=None
-    [  10.6s] event=None {"msg": "process_completed", "event_id": "ce31584e2e3d400eadb7eed90bab8f6e", "output": {"data": [{"path": "/tmp/gradio/4bb46d07ceb2978749cfc1d595fc441b9b8dbfd8527dfc41a00bcd00aed7424b/tmp_tovg1vn.mp4", "url": "https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space/gradio_api/file=/tmp/gradio/4bb46d07ceb2978749cfc1d595fc441b9b8dbfd8527dfc41a00bcd00aed7424b/tmp_tovg1vn.mp4", "size": null, "orig_name
-
-  total wall time: 10.6s
-  video_url: https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space/gradio_api/file=/tmp/gradio/4bb46d07ceb2978749cfc1d595fc441b9b8dbfd8527dfc41a00bcd00aed7424b/tmp_tovg1vn.mp4
-
-==============================================================================
-### 5) Fetch the generated mp4 with a browser Origin (CORS check)
-==============================================================================
-  HTTP 200  34846 bytes
-  Content-Type: video/mp4
-  access-control-allow-credentials: true
-  access-control-allow-origin: https://darthjarjar345.github.io
-  access-control-expose-headers: *
-  saved probe_output.mp4
+  generations succeeded: 0/4
 
 ==============================================================================
 ### SUMMARY
 ==============================================================================
-ALL PROBES PASSED ✅
+FAILURES:
+  - jsdelivr serves index.html as non-HTML
+  - gen#1 completed without video url
+  - gen#2 completed without video url
+  - gen#3 completed without video url
+  - gen#4 completed without video url
+  - only 0/4 generations succeeded
 ```
-total 36
--rw-r--r-- 1 runner runner 34846 Oct 10 20:41 probe_output.mp4
