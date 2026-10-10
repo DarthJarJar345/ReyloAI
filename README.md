@@ -5,7 +5,6 @@
 Live site (public, free, zero-config CDN mirror of the `reylo-v1` release tag):
 **https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v1/index.html**
 
-Mirror: <https://raw.githack.com/DarthJarJar345/ReyloAI/reylo-v1/index.html> ·
 GitHub Pages (`https://darthjarjar345.github.io/ReyloAI/`) is auto-provisioned by
 `.github/workflows/pages.yml` whenever an admin token is available to the CI.
 
