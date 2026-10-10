@@ -1,8 +1,16 @@
 name: Publish to GitHub Pages
 
-# Makes the repository public on GitHub Pages — fully automated.
-# Idempotent: creates the Pages site once (source = this branch), then
-# GitHub's legacy Pages build serves the static site on every push.
+# Attempts to provision a GitHub Pages site for this repository (idempotent).
+#
+# NOTE: creating a Pages site via the REST API requires *Pages:write* AND
+# *Administration:write*. The CI token (GITHUB_TOKEN) can never hold
+# `administration`, so on a stock repository this job reports 403 and exits
+# cleanly. The moment the repository owner connects an admin-capable token
+# (or flips Pages on once in Settings), this workflow finishes the job and
+# keeps the Pages source branch in sync on every push.
+#
+# Meanwhile the site is publicly released through the zero-config CDN mirror
+# of the release tag (see README).
 
 on:
   push:
@@ -25,58 +33,60 @@ jobs:
   ensure-pages:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      wait: ${{ steps.ensure.outputs.wait }}
     steps:
       - name: Ensure the Pages site exists and points at this branch
+        id: ensure
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -e
           repo="${GITHUB_REPOSITORY}"
           api="https://api.github.com/repos/${repo}/pages"
           auth="Authorization: Bearer ${GH_TOKEN}"
           accept="Accept: application/vnd.github+json"
+          wait="no"
 
           code=$(curl -s -o /tmp/pages.json -w '%{http_code}' -H "$auth" -H "$accept" "$api")
           if [ "$code" = "200" ]; then
-            echo "Pages site already exists:"
-            cat /tmp/pages.json
+            echo "Pages site already exists:"; cat /tmp/pages.json
             current_branch=$(python3 -c "import json;print(json.load(open('/tmp/pages.json')).get('source',{}).get('branch',''))")
             if [ "$current_branch" != "${GITHUB_REF_NAME}" ]; then
               echo "Re-pointing Pages source to ${GITHUB_REF_NAME}"
               put_code=$(curl -s -o /tmp/pages_put.json -w '%{http_code}' -X PUT -H "$auth" -H "$accept" \
-                -d "{\"build_type\":\"legacy\",\"source\":{\"branch\":\"${GITHUB_REF_NAME}\",\"path\":\"/\"}}" \
-                "$api")
+                -d "{\"build_type\":\"legacy\",\"source\":{\"branch\":\"${GITHUB_REF_NAME}\",\"path\":\"/\"}}" "$api")
               echo "PUT -> $put_code"; cat /tmp/pages_put.json
             fi
+            wait="yes"
           else
-            echo "GET /pages -> $code (site missing), creating on branch ${GITHUB_REF_NAME} ..."
+            echo "GET /pages -> $code (no site yet). Attempting creation on ${GITHUB_REF_NAME} ..."
             post_code=$(curl -s -o /tmp/pages_post.json -w '%{http_code}' -X POST -H "$auth" -H "$accept" \
-              -d "{\"build_type\":\"legacy\",\"source\":{\"branch\":\"${GITHUB_REF_NAME}\",\"path\":\"/\"}}" \
-              "$api")
+              -d "{\"build_type\":\"legacy\",\"source\":{\"branch\":\"${GITHUB_REF_NAME}\",\"path\":\"/\"}}" "$api")
             echo "POST -> $post_code"; cat /tmp/pages_post.json
+            if [ "$post_code" = "201" ]; then wait="yes"; fi
           fi
+          echo "wait=$wait" >> "$GITHUB_OUTPUT"
+
           {
             echo "# Pages provisioning report"
             echo
             echo "- run: ${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT} · ref: ${GITHUB_REF_NAME}"
             echo "- utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "- result: GET=$code POST=${post_code:-n/a} PUT=${put_code:-n/a} wait=$wait"
             echo
-            echo "GET  /pages -> $code"
+            if [ "$wait" = "no" ]; then
+              echo "Creating a Pages site needs **Pages:write + Administration:write**"
+              echo "(REST docs). GITHUB_TOKEN cannot hold \`administration\`, so CI cannot"
+              echo "provision Pages on a stock repo. The public release lives on the CDN"
+              echo "mirror of the release tag (see README). Flip Pages on once in"
+              echo "Settings → Pages (or grant an admin token) and this workflow takes over."
+              echo
+            fi
             echo '```json'
-            cat /tmp/pages.json 2>/dev/null
+            cat /tmp/pages.json 2>/dev/null; echo
+            cat /tmp/pages_post.json 2>/dev/null; echo
+            cat /tmp/pages_put.json 2>/dev/null
             echo '```'
-            if [ -f /tmp/pages_post.json ]; then
-              echo "POST /pages -> ${post_code:-?}"
-              echo '```json'
-              cat /tmp/pages_post.json
-              echo '```'
-            fi
-            if [ -f /tmp/pages_put.json ]; then
-              echo "PUT  /pages -> ${put_code:-?}"
-              echo '```json'
-              cat /tmp/pages_put.json
-              echo '```'
-            fi
           } > /tmp/pages-report.md
           python3 - <<'PY' || true
           import json, os, urllib.request
@@ -96,8 +106,7 @@ jobs:
           PY
 
       - name: Wait for the site to answer
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.ensure.outputs.wait == 'yes'
         run: |
           repo="${GITHUB_REPOSITORY}"
           url="https://${repo%%/*}.github.io/${repo##*/}/"
@@ -107,4 +116,4 @@ jobs:
             if [ "$code" = "200" ]; then echo "SITE LIVE at $url"; exit 0; fi
             sleep 20
           done
-          echo "Site not live yet (normal right after first creation) — it appears within a few minutes."
+          echo "Site not live yet — first Pages builds can take a few minutes."
