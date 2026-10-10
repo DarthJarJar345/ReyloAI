@@ -120,7 +120,9 @@ export class GradioSpaceClient {
   async endpointIndex(apiName, fallbackIndex = 0) {
     const cfg = await this.config();
     const deps = cfg._resolved.deps;
-    const idx = deps.findIndex((d) => d.api_name === apiName);
+    const norm = (s) => String(s || "").replace(/^\/+/, "");
+    let idx = deps.findIndex((d) => norm(d.api_name) === norm(apiName));
+    if (idx < 0) idx = deps.findIndex((d) => d.api_name === apiName);
     return idx >= 0 ? idx : fallbackIndex;
   }
 

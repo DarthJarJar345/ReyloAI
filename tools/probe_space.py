@@ -91,8 +91,22 @@ def main() -> int:
     # ---------------------------------------------------------------- 1. config
     hr("1) GET /gradio_api/config  (anonymous, with browser Origin)")
     t0 = time.time()
+    cfg = {}
+    prefix = "/gradio_api"
     try:
-        resp, body = request(API + "/config", headers={"Origin": ORIGIN}, timeout=120)
+        resp = None
+        body = None
+        for cand in ("/gradio_api/config", "/config"):
+            try:
+                resp, body = request(SPACE + cand, headers={"Origin": ORIGIN}, timeout=120)
+                prefix = "/gradio_api" if cand.startswith("/gradio_api") else ""
+                print(f"  config served at: {cand}")
+                break
+            except urllib.error.HTTPError as e:
+                print(f"  {cand} -> HTTP {e.code}")
+                resp = None
+        if resp is None:
+            raise RuntimeError("no config endpoint answered")
         cfg = json.loads(body)
         print(f"  HTTP {resp.status}  in {time.time() - t0:.1f}s")
         show_cors(resp)
@@ -202,16 +216,21 @@ def main() -> int:
             "session_hash": session_hash,
         }
         # find the fn_index for /generate_video if present
+        fn = None
         for i, d in enumerate(deps):
-            if d.get("api_name") == "/generate_video":
-                payload["fn_index"] = i
-                print(f"  fn_index for /generate_video = {i}")
+            print(f"    dep[{i}] api_name={d.get('api_name')!r}")
+            if str(d.get("api_name") or "").lstrip("/") == "generate_video":
+                fn = i
+        if fn is None:
+            fn = 0
+        payload["fn_index"] = fn
+        print(f"  using fn_index = {fn}")
         payload["endpoint"] = "/generate_video"
 
         t0 = time.time()
         try:
             resp, body = request(
-                API + "/queue/join",
+                SPACE + prefix + "/queue/join",
                 method="POST",
                 data=json.dumps(payload).encode(),
                 headers={"Origin": ORIGIN, "Content-Type": "application/json"},
@@ -239,7 +258,7 @@ def main() -> int:
             deadline = time.time() + 480
             try:
                 sse = request(
-                    API + f"/queue/data?session_hash={session_hash}",
+                    SPACE + prefix + f"/queue/data?session_hash={session_hash}",
                     headers={"Origin": ORIGIN, "Accept": "text/event-stream"},
                     timeout=(60, 600) if False else 600,
                     stream=True,
