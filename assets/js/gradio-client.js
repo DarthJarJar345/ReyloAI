@@ -189,8 +189,7 @@ export class GradioSpaceClient {
         imageUsed = true;
         continue;
       }
-      if (false) out.push(imageFileData);
-      else if (/negative/.test(key)) out.push(settings.negative);
+      if (/negative/.test(key)) out.push(settings.negative);
       else if (/prompt/.test(key)) out.push(settings.prompt);
       else if (/random/.test(key)) out.push(settings.randomize);
       else if (/seed/.test(key)) out.push(settings.seed);

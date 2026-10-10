@@ -6,11 +6,11 @@
   <title>Reylo AI Video Generator — free AI image-to-video (Wan 2.2 14B Fast)</title>
   <meta name="description" content="Turn any image into a cinematic AI video, free. Reylo AI Video Generator runs the Wan 2.2 14B Fast model (Lightning LoRA + FP8 + ZeroGPU) on Hugging Face — no account, no credits, no watermark.">
   <meta name="theme-color" content="#05060a">
-  <link rel="canonical" href="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v2/index.html">
+  <link rel="canonical" href="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v3/index.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Reylo AI Video Generator">
   <meta property="og:description" content="Free AI image-to-video in your browser. Powered by Wan 2.2 14B Fast on Hugging Face ZeroGPU.">
-  <meta property="og:url" content="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v2/index.html">
+  <meta property="og:url" content="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v3/index.html">
   <meta property="og:image" content="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v2/assets/samples/dune-wanderer.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
@@ -280,9 +280,22 @@
              and are cached only in your own browser's storage. No analytics, no accounts, no
              tracking pixels.</p>
         </article>
+
+        <article>
+          <h3>A fleet keeps it free for everyone</h3>
+          <p>Generation runs on a rotating fleet of free community GPU engines (Hugging Face
+             Spaces hosting Wan2.2 Fast), reached directly from your browser. If one engine is
+             down, asleep or momentarily full, the next one picks up automatically, and the CI in
+             this repo continuously validates and grows the fleet. Heavy back-to-back batches can
+             exhaust the shared free pool for a short window (~an hour) — the site shows a
+             countdown and re-arms on its own; an optional free Hugging Face token lifts even
+             that.</p>
+        </article>
       </div>
       <p class="how__credit">
-        Engine: <a href="https://huggingface.co/spaces/zerogpu-aoti/wan2-2-fp8da-aoti-faster" rel="noopener" target="_blank">zerogpu-aoti/wan2-2-fp8da-aoti-faster</a> ·
+        Engines: <a href="https://huggingface.co/spaces/zerogpu-aoti/wan2-2-fp8da-aoti-faster" rel="noopener" target="_blank">zerogpu-aoti/wan2-2-fp8da-aoti-faster</a> ·
+        <a href="https://huggingface.co/spaces/Upsampler/wan-2-2-14b-image-to-video" rel="noopener" target="_blank">Upsampler/wan-2-2-14b-image-to-video</a> ·
+        <a href="https://huggingface.co/spaces/Tinchote/wan-2-2-14b-image-to-video" rel="noopener" target="_blank">Tinchote/wan-2-2-14b-image-to-video</a> ·
         Weights: <a href="https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B" rel="noopener" target="_blank">Wan-AI/Wan2.2-I2V-A14B</a> (Apache-2.0) ·
         LoRA: <a href="https://huggingface.co/Kijai/WanVideo_comfy/tree/main/Wan22-Lightning" rel="noopener" target="_blank">Wan22-Lightning</a>.
         Reylo AI is an independent fan project and is not affiliated with Hugging Face or the model authors.
