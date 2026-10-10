@@ -506,9 +506,16 @@ function onStatus(status, detail = {}) {
     }
   }
   if (status === "queued" && detail.rank != null) {
-    el.statusMain.textContent = `In queue — position ${detail.rank}`;
-    el.statusSub.textContent = detail.eta ? `engine ETA ~${Math.round(detail.eta)}s` : "free shared ZeroGPU pool";
-    setProgress(null);
+    if (detail.rank > 0) {
+      el.statusMain.textContent = `In queue — position ${detail.rank}`;
+      el.statusSub.textContent = detail.eta
+        ? `engine ETA ~${Math.round(detail.eta)}s · free shared ZeroGPU pool`
+        : "free shared ZeroGPU pool";
+    } else {
+      el.statusMain.textContent = "GPU acquired — starting…";
+      el.statusSub.textContent = "loading fp8 Wan 2.2 14B + Lightning LoRA";
+    }
+    setProgress(0.02);
     return;
   }
   if (status === "log" && detail.log) {
