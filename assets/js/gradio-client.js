@@ -96,7 +96,13 @@ export class GradioSpaceClient {
             continue;
           }
           const cfg = JSON.parse(text);
-          this.prefix = path === "/gradio_api/config" ? "/gradio_api" : "/api";
+          // Gradio >=5 publishes its real API prefix in the config itself.
+          this.prefix =
+            typeof cfg.api_prefix === "string" && cfg.api_prefix !== ""
+              ? cfg.api_prefix.replace(/\/$/, "")
+              : path === "/gradio_api/config"
+                ? "/gradio_api"
+                : "";
           cfg._resolved = {
             version: cfg.version || "unknown",
             deps: cfg.dependencies || [],
@@ -201,13 +207,59 @@ export class GradioSpaceClient {
     }
 
     status("queued");
-    return await this._listen({
+    const heartbeat = this._openHeartbeat(sessionHash, signal);
+    try {
+      return await this._listen({
       sessionHash,
       eventId: joinBody.event_id || eventId,
-      onEvent,
-      onStatus: status,
-      signal,
-    });
+        onEvent,
+        onStatus: status,
+        signal,
+      });
+    } finally {
+      heartbeat.stop();
+    }
+  }
+
+  /**
+   * Gradio keeps sessions alive with a long-lived GET heartbeat stream.
+   * Fire-and-forget: we just hold the connection open.
+   */
+  _openHeartbeat(sessionHash, signal) {
+    let stopped = false;
+    let ctrl = null;
+    const run = async () => {
+      const cfg = await this.config().catch(() => null);
+      if (!cfg || !cfg.connect_heartbeat || stopped) return;
+      ctrl = new AbortController();
+      const onAbort = () => ctrl.abort();
+      signal?.addEventListener("abort", onAbort);
+      try {
+        const res = await this._fetch(
+          `${this.baseUrl}${this.prefix}/heartbeat/${sessionHash}`,
+          { headers: this.headers({ Accept: "text/event-stream" }), signal: ctrl.signal }
+        );
+        if (!res.ok || !res.body) return;
+        const reader = res.body.getReader();
+        while (!stopped) {
+          const { done } = await reader.read();
+          if (done) break;
+        }
+      } catch {
+        /* heartbeat is best-effort */
+      } finally {
+        signal?.removeEventListener("abort", onAbort);
+      }
+    };
+    run();
+    return {
+      stop() {
+        stopped = true;
+        try {
+          ctrl?.abort();
+        } catch { /* noop */ }
+      },
+    };
   }
 
   /** Listen to the SSE event stream until process_completed / error / abort. */

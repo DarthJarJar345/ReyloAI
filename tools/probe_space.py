@@ -108,7 +108,12 @@ def main() -> int:
         if resp is None:
             raise RuntimeError("no config endpoint answered")
         cfg = json.loads(body)
+        prefix = (cfg.get("api_prefix") or prefix or "/gradio_api").rstrip("/")
         print(f"  HTTP {resp.status}  in {time.time() - t0:.1f}s")
+        print(f"  api_prefix     : {cfg.get('api_prefix')!r} -> using {prefix!r}")
+        print(f"  protocol       : {cfg.get('protocol')!r}")
+        print(f"  connect_heartbeat: {cfg.get('connect_heartbeat')!r}")
+        print(f"  space_id       : {cfg.get('space_id')!r}")
         show_cors(resp)
         print(f"  gradio version : {cfg.get('version')}")
         print(f"  auth_required  : {cfg.get('auth_required')}")
