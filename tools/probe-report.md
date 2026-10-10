@@ -1,9 +1,9 @@
 # Space API probe report
 
-- run: 38089675397 / attempt 1
+- run: 38089878552 / attempt 1
 - ref: arena/50b14632-reyloai
-- sha: de1f4babd007ba2898cf0692eec92def9c20846b
-- utc: 2026-10-10T21:59:17Z
+- sha: 32f1f27175d5acfafcacaa7efbafa2a0a7d6421d
+- utc: 2026-10-10T22:02:48Z
 
 ```text
 Space : https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space
@@ -13,15 +13,16 @@ Gens  : 4
 ==============================================================================
 ### 0) Public mirror content-type check (which URL is a REAL website?)
 ==============================================================================
-  jsdelivr       HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
-      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
-  jsdelivr-css   HTTP 200  content-type='text/css; charset=utf-8'  -> NOT-HTML
-      first bytes: b'/* ================================================================\n   Reylo AI Video Generator \xe2\x80\x94 design system\n   dee'
-  statically     HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
-      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
-  githack        HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE
-  gh-raw         HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML
-      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, in'
+  jsdelivr       HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>Reylo AI Video Generator \xe2\x80\x94 free AI image-to-video (Wa'
+  jsdelivr-htm   HTTP 404  content-type='text/plain; charset=utf-8'
+  statically     HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>Reylo AI Video Generator \xe2\x80\x94 free AI image-to-video (Wa'
+  githack-raw    HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE  interstitial=False  ours=True
+  githack-cdn    HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE  interstitial=False  ours=True
+  githack-apex   HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE  interstitial=False  ours=True
+  gh-raw         HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>Reylo AI Video Generator \xe2\x80\x94 free AI image-to-video (Wa'
 
 ==============================================================================
 ### 1) GET config (anonymous, browser Origin)
@@ -52,41 +53,136 @@ Gens  : 4
 ==============================================================================
 ### 4) 4 consecutive anonymous generations
 ==============================================================================
-  gen#1: joined event_id=a79ca89a368e4d41b4b46bec4a701819
-    [  0.3s] estimation rank=0 eta=49.713273360327825
-    [  0.3s] process_starts rank=None eta=49.713273360327825
-    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
-  gen#1: NO VIDEO URL. full process_completed payload:
-    {"msg": "process_completed", "event_id": "a79ca89a368e4d41b4b46bec4a701819", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
-  gen#2: joined event_id=86e4d6fbbe094ad09716755fdd279cca
-    [  0.3s] estimation rank=0 eta=49.713273360327825
-    [  0.3s] process_starts rank=None eta=49.713273360327825
-    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
-  gen#2: NO VIDEO URL. full process_completed payload:
-    {"msg": "process_completed", "event_id": "86e4d6fbbe094ad09716755fdd279cca", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
-  gen#3: joined event_id=43f48cc5fd89451596909badf318860a
-    [  0.3s] estimation rank=0 eta=49.713273360327825
-    [  0.3s] process_starts rank=None eta=49.713273360327825
-    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
-  gen#3: NO VIDEO URL. full process_completed payload:
-    {"msg": "process_completed", "event_id": "43f48cc5fd89451596909badf318860a", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
-  gen#4: joined event_id=ba2849af982f40bca90f234ad15b1daa
-    [  0.3s] estimation rank=0 eta=49.713273360327825
-    [  0.3s] process_starts rank=None eta=49.713273360327825
-    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#1: joined event_id=8a046b47409147c4b1084989da43d860
+    [  0.5s] estimation rank=0 eta=67.52886096221668
+    [  0.5s] process_starts rank=None eta=67.52886096221668
+    [  3.7s] progress 10 desc=ZeroGPU init
+    [  4.0s] progress 20 desc=ZeroGPU init
+    [  4.2s] progress 21 desc=ZeroGPU init
+    [  4.3s] progress 22 desc=ZeroGPU init
+    [  4.3s] progress 23 desc=ZeroGPU init
+    [  4.3s] progress 24 desc=ZeroGPU init
+    [  4.4s] progress 25 desc=ZeroGPU init
+    [  4.4s] progress 26 desc=ZeroGPU init
+    [  4.4s] progress 27 desc=ZeroGPU init
+    [  4.4s] progress 28 desc=ZeroGPU init
+    [  4.5s] progress 29 desc=ZeroGPU init
+    [  4.5s] progress 30 desc=ZeroGPU init
+    [  4.5s] progress 31 desc=ZeroGPU init
+    [  4.5s] progress 32 desc=ZeroGPU init
+    [  4.6s] progress 33 desc=ZeroGPU init
+    [  4.6s] progress 34 desc=ZeroGPU init
+    [  4.6s] progress 35 desc=ZeroGPU init
+    [  4.7s] progress 36 desc=ZeroGPU init
+    [  4.7s] progress 37 desc=ZeroGPU init
+    [  4.7s] progress 38 desc=ZeroGPU init
+    [  4.8s] progress 39 desc=ZeroGPU init
+    [  4.8s] progress 40 desc=ZeroGPU init
+    [  4.8s] progress 41 desc=ZeroGPU init
+    [  4.8s] progress 42 desc=ZeroGPU init
+    [  4.9s] progress 43 desc=ZeroGPU init
+    [  4.9s] progress 44 desc=ZeroGPU init
+    [  5.0s] progress 45 desc=ZeroGPU init
+    [  5.0s] progress 46 desc=ZeroGPU init
+    [  5.0s] progress 47 desc=ZeroGPU init
+    [  5.0s] progress 48 desc=ZeroGPU init
+    [  5.1s] progress 49 desc=ZeroGPU init
+    [  5.1s] progress 50 desc=ZeroGPU init
+    [  5.1s] progress 51 desc=ZeroGPU init
+    [  5.1s] progress 52 desc=ZeroGPU init
+    [  5.2s] progress 53 desc=ZeroGPU init
+    [  5.2s] progress 54 desc=ZeroGPU init
+    [  5.2s] progress 55 desc=ZeroGPU init
+    [  5.3s] progress 56 desc=ZeroGPU init
+    [  5.3s] progress 57 desc=ZeroGPU init
+    [  5.3s] progress 58 desc=ZeroGPU init
+    [  5.4s] progress 59 desc=ZeroGPU init
+    [  5.4s] progress 60 desc=ZeroGPU init
+    [  5.4s] progress 61 desc=ZeroGPU init
+    [  5.4s] progress 62 desc=ZeroGPU init
+    [  5.5s] progress 63 desc=ZeroGPU init
+    [  5.5s] progress 64 desc=ZeroGPU init
+    [  5.5s] progress 65 desc=ZeroGPU init
+    [  5.5s] progress 66 desc=ZeroGPU init
+    [  5.6s] progress 67 desc=ZeroGPU init
+    [  5.6s] progress 68 desc=ZeroGPU init
+    [  5.6s] progress 69 desc=ZeroGPU init
+    [  5.6s] progress 70 desc=ZeroGPU init
+    [  5.7s] progress 71 desc=ZeroGPU init
+    [  5.7s] progress 72 desc=ZeroGPU init
+    [  5.7s] progress 73 desc=ZeroGPU init
+    [  5.7s] progress 74 desc=ZeroGPU init
+    [  5.8s] progress 75 desc=ZeroGPU init
+    [  5.8s] progress 76 desc=ZeroGPU init
+    [  5.8s] progress 77 desc=ZeroGPU init
+    [  5.8s] progress 78 desc=ZeroGPU init
+    [  5.9s] progress 79 desc=ZeroGPU init
+    [  5.9s] progress 80 desc=ZeroGPU init
+    [  5.9s] progress 81 desc=ZeroGPU init
+    [  5.9s] progress 82 desc=ZeroGPU init
+    [  6.0s] progress 83 desc=ZeroGPU init
+    [  6.0s] progress 84 desc=ZeroGPU init
+    [  6.0s] progress 85 desc=ZeroGPU init
+    [  6.0s] progress 86 desc=ZeroGPU init
+    [  6.1s] progress 87 desc=ZeroGPU init
+    [  6.1s] progress 88 desc=ZeroGPU init
+    [  6.1s] progress 89 desc=ZeroGPU init
+    [  6.1s] progress 90 desc=ZeroGPU init
+    [  6.2s] progress 91 desc=ZeroGPU init
+    [  6.2s] progress 92 desc=ZeroGPU init
+    [  6.2s] progress 93 desc=ZeroGPU init
+    [  6.3s] progress 94 desc=ZeroGPU init
+    [  6.3s] progress 95 desc=ZeroGPU init
+    [  6.3s] progress 96 desc=ZeroGPU init
+    [  6.4s] progress 97 desc=ZeroGPU init
+    [  6.4s] progress 98 desc=ZeroGPU init
+    [  6.4s] progress 99 desc=ZeroGPU init
+    [  6.4s] progress 100 desc=ZeroGPU init
+    [  6.4s] progress None desc=None
+    [  7.4s] progress 0 desc=None
+    [  8.3s] progress 1 desc=None
+    [  8.6s] progress 2 desc=None
+    [  9.2s] progress 3 desc=None
+    [  9.8s] progress None desc=None
+    [ 10.9s] process_completed success=None data_len=2 error='None'
+  gen#1: OK in 11.2s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#2: joined event_id=b0b5e6783a4f4c6cb50e119e9a6e12aa
+    [  0.4s] estimation rank=0 eta=67.34566686009667
+    [  0.4s] process_starts rank=None eta=67.34566686009667
+    [  0.8s] progress 0 desc=None
+    [  1.4s] progress 1 desc=None
+    [  1.9s] progress 2 desc=None
+    [  2.5s] progress 3 desc=None
+    [  3.1s] progress None desc=None
+    [  4.5s] process_completed success=None data_len=2 error='None'
+  gen#2: OK in 4.9s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#3: joined event_id=b7ae51121d9b436ab3808cd7ac21f4aa
+    [  0.4s] estimation rank=0 eta=67.1478037848976
+    [  0.4s] process_starts rank=None eta=67.1478037848976
+    [  0.9s] progress 0 desc=None
+    [  1.5s] progress 1 desc=None
+    [  2.0s] progress 2 desc=None
+    [  2.6s] progress 3 desc=None
+    [  3.1s] progress None desc=None
+    [  4.1s] process_completed success=None data_len=2 error='None'
+  gen#3: OK in 4.3s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#4: joined event_id=09fa4632127e461c866061d67a70ff21
+    [  0.4s] estimation rank=0 eta=67.01712473758981
+    [  0.4s] process_starts rank=None eta=67.01712473758981
+    [  0.4s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
   gen#4: NO VIDEO URL. full process_completed payload:
-    {"msg": "process_completed", "event_id": "ba2849af982f40bca90f234ad15b1daa", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+    {"msg": "process_completed", "event_id": "09fa4632127e461c866061d67a70ff21", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
 
-  generations succeeded: 0/4
+  generations succeeded: 3/4
 
 ==============================================================================
 ### SUMMARY
 ==============================================================================
 FAILURES:
   - jsdelivr serves index.html as non-HTML
-  - gen#1 completed without video url
-  - gen#2 completed without video url
-  - gen#3 completed without video url
+  - jsdelivr serves index.html as non-HTML
   - gen#4 completed without video url
-  - only 0/4 generations succeeded
+  - only 3/4 generations succeeded
 ```
+total 36
+-rw-r--r-- 1 runner runner 34846 Oct 10 22:02 probe_output.mp4
