@@ -270,6 +270,7 @@ def main() -> int:
                 )
                 show_cors(sse)
                 event_name = None
+                last_progress_idx = None
                 for raw in sse:
                     line = raw.decode("utf-8", "replace").rstrip("\r\n")
                     if line.startswith("event:"):
@@ -285,13 +286,17 @@ def main() -> int:
                         if event_name == "heartbeat":
                             continue
                         events.append((event_name, msg))
-                        slim = json.dumps(msg)[:400]
-                        print(f"    [{time.time() - t0:6.1f}s] event={event_name} {slim}", flush=True)
-                        if event_name == "message" and msg.get("msg") == "progress_data":
-                            pass
-                        if event_name in ("complete", "message") and msg.get("msg") in (
-                            "process_completed", "process_full_completed"
-                        ):
+                        mtype = msg.get("msg")
+                        if mtype == "progress":
+                            pdata = msg.get("progress_data") or []
+                            idx = pdata[0].get("index") if pdata else None
+                            if idx != last_progress_idx:
+                                last_progress_idx = idx
+                                print(f"    [{time.time() - t0:6.1f}s] progress {idx}/{pdata[0].get('length') if pdata else '?'} desc={pdata[0].get('desc') if pdata else None}", flush=True)
+                        else:
+                            slim = json.dumps(msg)[:400]
+                            print(f"    [{time.time() - t0:6.1f}s] event={event_name} {slim}", flush=True)
+                        if mtype in ("process_completed", "process_full_completed"):
                             out = msg.get("output") or {}
                             data = out.get("data") or []
                             if data and isinstance(data[0], dict):

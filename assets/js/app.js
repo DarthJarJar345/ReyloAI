@@ -490,10 +490,18 @@ function onStatus(status, detail = {}) {
   if (status === "progress" && Array.isArray(detail.progress) && detail.progress.length) {
     const p = detail.progress[detail.progress.length - 1];
     if (p && p.length) {
-      const frac = (p.index ?? 0) / p.length;
-      setProgress(frac);
-      el.statusMain.textContent = `Denoising… ${Math.round(frac * 100)}%`;
-      el.statusSub.textContent = p.desc || `step ${p.index ?? 0} of ${p.length}`;
+      const frac = Math.min(1, (p.index ?? 0) / p.length);
+      if (p.desc) {
+        // phase 1: ZeroGPU allocation / model warm-up (≈ first 15% of the ring)
+        setProgress(0.02 + 0.13 * frac);
+        el.statusMain.textContent = `${p.desc}… ${Math.round(frac * 100)}%`;
+        el.statusSub.textContent = "reserving the free GPU";
+      } else {
+        // phase 2: denoising steps
+        setProgress(0.15 + 0.8 * frac);
+        el.statusMain.textContent = `Denoising… ${Math.round(frac * 100)}%`;
+        el.statusSub.textContent = `step ${p.index ?? 0} of ${p.length}`;
+      }
       return;
     }
   }

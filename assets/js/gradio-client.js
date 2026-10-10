@@ -335,9 +335,16 @@ export class GradioSpaceClient {
                 onStatus("processing");
                 break;
               case "estimation":
-                onStatus("queued", { rank: msg.rank, queueSize: msg.queue_size, eta: msg.eta });
+                onStatus("queued", {
+                  rank: msg.rank,
+                  queueSize: msg.queue_size,
+                  eta: msg.rank_eta ?? msg.eta,
+                });
                 break;
-              case "progress_data":
+              case "progress": // Gradio 6
+                onStatus("progress", { progress: msg.progress_data });
+                break;
+              case "progress_data": // Gradio 4/5
                 onStatus("progress", { progress: msg.output?.progress });
                 break;
               case "log":
