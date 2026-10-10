@@ -1,0 +1,48 @@
+name: Space API Probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_generate:
+        description: "Skip the full generation round-trip (CORS/config checks only)"
+        type: boolean
+        default: false
+  push:
+    paths:
+      - "tools/probe_space.py"
+      - ".github/workflows/probe.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: space-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run probe
+        run: |
+          set -o pipefail
+          ARGS=""
+          if [ "${{ inputs.skip_generate }}" = "true" ]; then ARGS="--skip-generate"; fi
+          python3 tools/probe_space.py $ARGS 2>&1 | tee probe.log
+
+      - name: Upload probe output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe-output
+          path: |
+            probe.log
+            probe_output.mp4
+          if-no-files-found: ignore
