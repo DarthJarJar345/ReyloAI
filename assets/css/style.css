@@ -406,6 +406,11 @@ input[type="range"]::-moz-range-thumb {
   padding: 5px 11px; border-radius: 8px;
 }
 .output-bar__btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.engine-badge {
+  font-size: 11px; color: var(--blue);
+  background: rgba(76, 201, 240, 0.07); border: 1px solid rgba(76, 201, 240, 0.28);
+  padding: 5px 11px; border-radius: 8px; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+}
 
 /* -------------------------------------------------------- gallery */
 

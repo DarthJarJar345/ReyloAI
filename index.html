@@ -73,6 +73,7 @@
         <li><strong>16 fps</strong><span>up to 5 s clips</span></li>
         <li><strong>832×480</strong><span>cinematic 16:9</span></li>
         <li><strong>$0</strong><span>always free</span></li>
+        <li><strong>∞</strong><span>rotating engine fleet</span></li>
       </ul>
     </section>
 
@@ -217,6 +218,7 @@
 
           <div class="output-bar">
             <span class="mono seed" id="seed-badge">seed —</span>
+            <span class="mono engine-badge" id="engine-badge" title="Which free engine served this clip">engine —</span>
             <div class="output-bar__btns">
               <a class="btn btn--tiny" id="download" download="reylo-video.mp4" href="#">Download</a>
               <button class="btn btn--tiny btn--ghost" id="save" type="button">Save to gallery</button>
@@ -309,6 +311,13 @@
       <details><summary>Where are my videos stored?</summary>
         <p>In your own browser (IndexedDB), never on our side — this site has no server at all.
         Clearing browser storage clears the gallery; use <em>Download</em> to keep a file.</p>
+      </details>
+      <details><summary>How is this "unlimited" if the free GPU pool has limits?</summary>
+        <p>Each free engine limits anonymous use <em>per visitor</em>, not per site. Reylo AI ships a
+        fleet of independent free engines and rotates them in your browser: when one pool taps out
+        for you, the next one silently takes over, and parked pools un-park automatically after
+        their cooldown. In practice that means you can keep generating long after any single pool
+        would have stopped you — and other visitors never consume your share.</p>
       </details>
       <details><summary>I hit a quota / auth error. Now what?</summary>
         <p>Two free fixes: wait a few minutes for the shared pool to free up, or paste your own

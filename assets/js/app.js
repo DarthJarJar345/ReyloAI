@@ -11,6 +11,14 @@ import {
   newSessionHash,
 } from "./gradio-client.js";
 import {
+  ENGINES,
+  BLOCK_TTL,
+  loadBlocked,
+  saveBlocked,
+  lastGoodEngine,
+  setLastGoodEngine,
+} from "./engines.js";
+import {
   addToGallery,
   listGallery,
   removeFromGallery,
@@ -120,6 +128,7 @@ const el = {
   errorText: $("#error-text"),
   errorRetry: $("#error-retry"),
   seedBadge: $("#seed-badge"),
+  engineBadge: $("#engine-badge"),
   download: $("#download"),
   save: $("#save"),
   regen: $("#regen"),
@@ -152,6 +161,43 @@ const state = {
 const client = new GradioSpaceClient(SPACE_HOST, {
   token: localStorage.getItem(TOKEN_KEY) || null,
 });
+
+/* ------------------------------------------------------- engine fleet */
+
+const clients = new Map();
+function getClient(host) {
+  let c = clients.get(host);
+  if (!c) {
+    c = new GradioSpaceClient(host, {
+      token: localStorage.getItem(TOKEN_KEY) || null,
+    });
+    clients.set(host, c);
+  }
+  return c;
+}
+
+let blocked = loadBlocked();
+function markBlocked(host, kind) {
+  const ttl = BLOCK_TTL[kind] || BLOCK_TTL.unknown;
+  blocked[host] = { kind, until: Date.now() + ttl };
+  saveBlocked(blocked);
+}
+function engineOrder() {
+  const list = [...ENGINES];
+  const last = lastGoodEngine();
+  if (last) {
+    const i = list.findIndex((e) => e.host === last);
+    if (i > 0) list.unshift(list.splice(i, 1)[0]);
+  }
+  const open = list.filter((e) => !blocked[e.host]);
+  if (open.length) return open;
+  blocked = {}; // everything parked (quota windows expired elsewhere?) -> reset
+  saveBlocked(blocked);
+  return list;
+}
+function setEngineBadge(text) {
+  if (el.engineBadge) el.engineBadge.textContent = text;
+}
 
 /* ---------------------------------------------------------------- toast */
 
@@ -409,6 +455,7 @@ function initAdvanced() {
     if (v) localStorage.setItem(TOKEN_KEY, v);
     else localStorage.removeItem(TOKEN_KEY);
     client.setToken(v);
+    clients.forEach((c) => c.setToken(v));
     toast(v ? "Token saved locally (this browser only)." : "Token cleared.", {
       kind: "success",
     });
@@ -585,54 +632,84 @@ async function generate() {
   el.statusSub.textContent = "waking ZeroGPU if it was asleep";
   startTimer();
 
-  const payload = [
-    await buildImageData(),
-    s.prompt,
-    s.steps,
-    s.negative,
-    s.duration,
-    s.guidance,
-    s.guidance2,
-    s.seed,
-    s.randomize,
-  ];
-
-  const MAX_ATTEMPTS = 3;
-  let attempt = 0;
+  const imageData = await buildImageData();
+  const order = engineOrder();
   let result = null;
   let lastErr = null;
+  let usedEngine = null;
 
-  while (attempt < MAX_ATTEMPTS && !result) {
-    attempt += 1;
+  for (let ei = 0; ei < order.length && !result; ei += 1) {
+    const engine = order[ei];
+    const engClient = getClient(engine.host);
+    setEngineBadge(`engine ${ei + 1}/${order.length} · ${engine.label}`);
+    el.statusSub.textContent = engine.label;
+
+    let discovery = null;
     try {
-      result = await client.predict({
-        apiName: ENDPOINT,
-        data: payload,
-        sessionHash: state.session,
-        onStatus,
-        signal: state.abort.signal,
-      });
+      discovery = await engClient.discoverI2V();
     } catch (err) {
       lastErr = err;
-      const kind = err instanceof SpaceError ? err.kind : "unknown";
-      const retryable =
-        err instanceof SpaceError &&
-        ["sleeping", "network", "engine"].includes(kind) &&
-        attempt < MAX_ATTEMPTS &&
-        !state.abort.signal.aborted;
-      if (retryable) {
-        const wait = 5000 * attempt;
-        el.statusMain.textContent = `Attempt ${attempt} didn't return a video — retrying in ${Math.round(wait / 1000)}s…`;
-        el.statusSub.textContent =
-          kind === "sleeping"
-            ? "cold starts on the free tier can take a minute"
-            : "transient ZeroGPU blips are normal; the retry usually succeeds";
-        setProgress(null);
-        await new Promise((r) => setTimeout(r, wait));
-        state.session = newSessionHash();
-        continue;
+    }
+    if (!discovery) {
+      markBlocked(engine.host, "engine");
+      continue;
+    }
+    let payload;
+    try {
+      payload = engClient.buildI2VPayload(
+        discovery,
+        { ...s, imageWidth: state.image.width, imageHeight: state.image.height },
+        imageData,
+        framesFor
+      );
+    } catch (err) {
+      lastErr = err;
+      markBlocked(engine.host, "engine");
+      continue;
+    }
+
+    const ATTEMPTS_PER_ENGINE = 2;
+    for (let attempt = 1; attempt <= ATTEMPTS_PER_ENGINE && !result; attempt += 1) {
+      try {
+        result = await engClient.predict({
+          apiName: discovery.endpoint,
+          fnIndex: discovery.fnIndex,
+          data: payload,
+          sessionHash: state.session,
+          onStatus,
+          signal: state.abort.signal,
+        });
+        usedEngine = engine;
+      } catch (err) {
+        lastErr = err;
+        if (state.abort.signal.aborted) break;
+        const kind = err instanceof SpaceError ? err.kind : "unknown";
+        if (["quota", "auth", "engine", "http"].includes(kind)) {
+          markBlocked(engine.host, kind); // park it, next engine takes over
+          break;
+        }
+        // sleeping / network: one patient retry on the same engine
+        if (attempt < ATTEMPTS_PER_ENGINE) {
+          const wait = 5000 * attempt;
+          el.statusMain.textContent = `Engine warming up — retrying in ${Math.round(wait / 1000)}s…`;
+          setProgress(null);
+          await new Promise((r) => setTimeout(r, wait));
+          state.session = newSessionHash();
+          continue;
+        }
+        markBlocked(engine.host, kind);
+        break;
       }
-      break;
+    }
+
+    if (!result && ei < order.length - 1 && !state.abort.signal.aborted) {
+      toast(`“${engine.label}” is out of free runs right now — switching to the next engine in the fleet…`, {
+        kind: "info",
+      });
+      el.statusMain.textContent = "Switching engine…";
+      el.statusSub.textContent = "the fleet keeps your free generations flowing";
+      setProgress(null);
+      state.session = newSessionHash();
     }
   }
 
@@ -651,7 +728,7 @@ async function generate() {
     let msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
     if (lastErr instanceof SpaceError && lastErr.kind === "quota") {
       msg +=
-        " Tip: the free pool resets after a while — or paste your own free Hugging Face token under Advanced settings to use your personal quota.";
+        " Every engine in the fleet was parked for this browser. Free pools reset after a while — or paste your own free Hugging Face token under Advanced settings to use your personal quota.";
     }
     el.errorText.textContent = msg;
     setStage("error");
@@ -659,6 +736,10 @@ async function generate() {
     return;
   }
 
+  if (usedEngine) {
+    setLastGoodEngine(usedEngine.host);
+    setEngineBadge(`served by ${usedEngine.label}`);
+  }
   await presentResult(result, s);
 }
 
