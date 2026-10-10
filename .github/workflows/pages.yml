@@ -1,0 +1,69 @@
+name: Publish to GitHub Pages
+
+# Makes the repository public on GitHub Pages — fully automated.
+# Idempotent: creates the Pages site once (source = this branch), then
+# GitHub's legacy Pages build serves the static site on every push.
+
+on:
+  push:
+    paths:
+      - "index.html"
+      - "manifest.webmanifest"
+      - "assets/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+
+concurrency:
+  group: pages-publish
+  cancel-in-progress: false
+
+jobs:
+  ensure-pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Ensure the Pages site exists and points at this branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          repo="${GITHUB_REPOSITORY}"
+          api="https://api.github.com/repos/${repo}/pages"
+          auth="Authorization: Bearer ${GH_TOKEN}"
+          accept="Accept: application/vnd.github+json"
+
+          code=$(curl -s -o /tmp/pages.json -w '%{http_code}' -H "$auth" -H "$accept" "$api")
+          if [ "$code" = "200" ]; then
+            echo "Pages site already exists:"
+            cat /tmp/pages.json
+            current_branch=$(python3 -c "import json;print(json.load(open('/tmp/pages.json')).get('source',{}).get('branch',''))")
+            if [ "$current_branch" != "${GITHUB_REF_NAME}" ]; then
+              echo "Re-pointing Pages source to ${GITHUB_REF_NAME}"
+              curl -sS -X PUT -H "$auth" -H "$accept" \
+                -d "{\"build_type\":\"legacy\",\"source\":{\"branch\":\"${GITHUB_REF_NAME}\",\"path\":\"/\"}}" \
+                "$api" | head -c 600
+            fi
+          else
+            echo "Creating Pages site on branch ${GITHUB_REF_NAME} ..."
+            curl -sS -X POST -H "$auth" -H "$accept" \
+              -d "{\"build_type\":\"legacy\",\"source\":{\"branch\":\"${GITHUB_REF_NAME}\",\"path\":\"/\"}}" \
+              "$api" | head -c 600
+          fi
+
+      - name: Wait for the site to answer
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          repo="${GITHUB_REPOSITORY}"
+          url="https://${repo%%/*}.github.io/${repo##*/}/"
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -m 20 "$url" || true)
+            echo "attempt $i: $url -> $code"
+            if [ "$code" = "200" ]; then echo "SITE LIVE at $url"; exit 0; fi
+            sleep 20
+          done
+          echo "Site not live yet (normal right after first creation) — it appears within a few minutes."
