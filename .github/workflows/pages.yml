@@ -43,16 +43,57 @@ jobs:
             current_branch=$(python3 -c "import json;print(json.load(open('/tmp/pages.json')).get('source',{}).get('branch',''))")
             if [ "$current_branch" != "${GITHUB_REF_NAME}" ]; then
               echo "Re-pointing Pages source to ${GITHUB_REF_NAME}"
-              curl -sS -X PUT -H "$auth" -H "$accept" \
+              put_code=$(curl -s -o /tmp/pages_put.json -w '%{http_code}' -X PUT -H "$auth" -H "$accept" \
                 -d "{\"build_type\":\"legacy\",\"source\":{\"branch\":\"${GITHUB_REF_NAME}\",\"path\":\"/\"}}" \
-                "$api" | head -c 600
+                "$api")
+              echo "PUT -> $put_code"; cat /tmp/pages_put.json
             fi
           else
-            echo "Creating Pages site on branch ${GITHUB_REF_NAME} ..."
-            curl -sS -X POST -H "$auth" -H "$accept" \
+            echo "GET /pages -> $code (site missing), creating on branch ${GITHUB_REF_NAME} ..."
+            post_code=$(curl -s -o /tmp/pages_post.json -w '%{http_code}' -X POST -H "$auth" -H "$accept" \
               -d "{\"build_type\":\"legacy\",\"source\":{\"branch\":\"${GITHUB_REF_NAME}\",\"path\":\"/\"}}" \
-              "$api" | head -c 600
+              "$api")
+            echo "POST -> $post_code"; cat /tmp/pages_post.json
           fi
+          {
+            echo "# Pages provisioning report"
+            echo
+            echo "- run: ${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT} · ref: ${GITHUB_REF_NAME}"
+            echo "- utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo
+            echo "GET  /pages -> $code"
+            echo '```json'
+            cat /tmp/pages.json 2>/dev/null
+            echo '```'
+            if [ -f /tmp/pages_post.json ]; then
+              echo "POST /pages -> ${post_code:-?}"
+              echo '```json'
+              cat /tmp/pages_post.json
+              echo '```'
+            fi
+            if [ -f /tmp/pages_put.json ]; then
+              echo "PUT  /pages -> ${put_code:-?}"
+              echo '```json'
+              cat /tmp/pages_put.json
+              echo '```'
+            fi
+          } > /tmp/pages-report.md
+          python3 - <<'PY' || true
+          import json, os, urllib.request
+          body = open("/tmp/pages-report.md").read()
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/commits/{os.environ['GITHUB_SHA']}/comments",
+              data=json.dumps({"body": body[:60000]}).encode(),
+              headers={"Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                       "Accept": "application/vnd.github+json",
+                       "User-Agent": "pages-bot"},
+              method="POST")
+          try:
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  print("commit comment published:", r.status)
+          except Exception as e:
+              print("commit comment failed:", e)
+          PY
 
       - name: Wait for the site to answer
         env:
