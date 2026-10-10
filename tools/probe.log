@@ -4,7 +4,21 @@ Origin: https://darthjarjar345.github.io
 ==============================================================================
 ### 1) GET /gradio_api/config  (anonymous, with browser Origin)
 ==============================================================================
-  FAILED: HTTPError: HTTP Error 404: Not Found
+  /gradio_api/config -> HTTP 404
+  config served at: /config
+  HTTP 200  in 0.4s
+  access-control-allow-credentials: true
+  access-control-allow-origin: https://darthjarjar345.github.io
+  access-control-expose-headers: *
+  gradio version : 6.1.0
+  auth_required  : None
+  auth_message   : None
+  enable_queue   : True
+  max_file_size: None
+  #dependencies  : 3
+    [0] api_name='generate_video' inputs=9 outputs=2 queue=True
+    [1] api_name='load_example_input' inputs=1 outputs=3 queue=False
+    [2] api_name='load_example' inputs=1 outputs=2 queue=True
 
 ==============================================================================
 ### 2) GET /gradio_api/info  (named endpoints)
@@ -37,15 +51,17 @@ Origin: https://darthjarjar345.github.io
 ### 4) Anonymous end-to-end generation via /queue/join + SSE /queue/data
 ==============================================================================
   test image: 2335 bytes 512x288
-  queue/join -> HTTP 400
-  access-control-allow-credentials: true
+    dep[0] api_name='generate_video'
+    dep[1] api_name='load_example_input'
+    dep[2] api_name='load_example'
+  using fn_index = 0
+  queue/join -> HTTP 405
   access-control-allow-origin: https://darthjarjar345.github.io
   access-control-expose-headers: *
-  body: {"detail":"No function index provided."}
+  body: {"type":"error","error":{"message":"Method Not Allowed"}}
 
 ==============================================================================
 ### SUMMARY
 ==============================================================================
 FAILURES:
-  - config request failed: HTTP Error 404: Not Found
-  - queue/join HTTP 400: {"detail":"No function index provided."}
+  - queue/join HTTP 405: {"type":"error","error":{"message":"Method Not Allowed"}}

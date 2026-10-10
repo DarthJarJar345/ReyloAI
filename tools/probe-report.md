@@ -1,9 +1,9 @@
 # Space API probe report
 
-- run: 38084237457 / attempt 1
+- run: 38084379947 / attempt 1
 - ref: arena/50b14632-reyloai
-- sha: fdc25ef8643b2c8425688d9195e22f0c6951f06c
-- utc: 2026-10-10T20:33:57Z
+- sha: 6903d94101a38893fa088eb95791ce04c732f7a3
+- utc: 2026-10-10T20:36:08Z
 
 ```text
 Space : https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space
@@ -12,7 +12,21 @@ Origin: https://darthjarjar345.github.io
 ==============================================================================
 ### 1) GET /gradio_api/config  (anonymous, with browser Origin)
 ==============================================================================
-  FAILED: HTTPError: HTTP Error 404: Not Found
+  /gradio_api/config -> HTTP 404
+  config served at: /config
+  HTTP 200  in 0.4s
+  access-control-allow-credentials: true
+  access-control-allow-origin: https://darthjarjar345.github.io
+  access-control-expose-headers: *
+  gradio version : 6.1.0
+  auth_required  : None
+  auth_message   : None
+  enable_queue   : True
+  max_file_size: None
+  #dependencies  : 3
+    [0] api_name='generate_video' inputs=9 outputs=2 queue=True
+    [1] api_name='load_example_input' inputs=1 outputs=3 queue=False
+    [2] api_name='load_example' inputs=1 outputs=2 queue=True
 
 ==============================================================================
 ### 2) GET /gradio_api/info  (named endpoints)
@@ -45,16 +59,18 @@ Origin: https://darthjarjar345.github.io
 ### 4) Anonymous end-to-end generation via /queue/join + SSE /queue/data
 ==============================================================================
   test image: 2335 bytes 512x288
-  queue/join -> HTTP 400
-  access-control-allow-credentials: true
+    dep[0] api_name='generate_video'
+    dep[1] api_name='load_example_input'
+    dep[2] api_name='load_example'
+  using fn_index = 0
+  queue/join -> HTTP 405
   access-control-allow-origin: https://darthjarjar345.github.io
   access-control-expose-headers: *
-  body: {"detail":"No function index provided."}
+  body: {"type":"error","error":{"message":"Method Not Allowed"}}
 
 ==============================================================================
 ### SUMMARY
 ==============================================================================
 FAILURES:
-  - config request failed: HTTP Error 404: Not Found
-  - queue/join HTTP 400: {"detail":"No function index provided."}
+  - queue/join HTTP 405: {"type":"error","error":{"message":"Method Not Allowed"}}
 ```
