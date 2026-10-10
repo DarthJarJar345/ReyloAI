@@ -1,9 +1,28 @@
 # Fleet probe report
 
-- run: 38094693965.1 · ref: arena/50b14632-reyloai
-- utc: 2026-10-10T23:29:18Z
+- run: 38095326973.1 · ref: arena/50b14632-reyloai
+- utc: 2026-10-10T23:40:16Z
 
 ```text
+
+==============================================================================
+### 1) locate Gradio roots behind ModelScope studios
+==============================================================================
+  https://modelscope.cn/studios/Wan-AI/Wan2.2-I2V-A14B -> gradio root: None
+  https://modelscope.cn/studios/iic/Wan2.2-I2V-A14B -> gradio root: None
+  https://modelscope.cn/studios/Wan-AI/Wan2.1-I2V-14B -> gradio root: None
+  https://modelscope.cn/studios/iic/Wan2.1-I2V-14B -> gradio root: None
+  https://modelscope.cn/studios/Wan-AI/Wan2.2-I2V -> gradio root: None
+
+==============================================================================
+### 2) anonymous generation test on each reachable root
+==============================================================================
+
+==============================================================================
+### SUMMARY
+==============================================================================
+  no reachable ModelScope gradio roots
+
 
 ==============================================================================
 ### 1) discover I2V engines via /config (hardware-prefiltered)
@@ -25,9 +44,9 @@
 ==============================================================================
 ### 2) exhaust ZeroGPU quota on primary (same IP)
 ==============================================================================
-  exhaust#1 zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 10.4s
+  exhaust#1 zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 4.1s
   exhaust#2 zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 4.1s
-  exhaust#3 zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 4.1s
+  exhaust#3 zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 4.2s
   exhaust#4 zerogpu-aoti-wan2-2-fp8da-aoti-faster -> QUOTA You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
 
 ==============================================================================
@@ -37,9 +56,9 @@
 ==============================================================================
 ### SUMMARY
 ==============================================================================
-   - exhaust  zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 10.4s
    - exhaust  zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 4.1s
    - exhaust  zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 4.1s
+   - exhaust  zerogpu-aoti-wan2-2-fp8da-aoti-faster -> OK 4.2s
    - exhaust  zerogpu-aoti-wan2-2-fp8da-aoti-faster -> QUOTA You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
   alternates OK while primary quota-blocked: 0
 ```
