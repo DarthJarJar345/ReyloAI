@@ -180,10 +180,16 @@ export class GradioSpaceClient {
    */
   buildI2VPayload(discovery, settings, imageFileData, framesFor) {
     const out = [];
+    let imageUsed = false;
     for (const p of discovery.params) {
       const key = `${p.name} ${p.label}`.toLowerCase();
-      const isImg = p.comp === "image" || /image|img/.test(key);
-      if (isImg && p.comp === "image") out.push(imageFileData);
+      if (p.comp === "image") {
+        // first image input = source frame; extra ones (end/mask image) stay default
+        out.push(imageUsed ? (p.def ?? null) : imageFileData);
+        imageUsed = true;
+        continue;
+      }
+      if (false) out.push(imageFileData);
       else if (/negative/.test(key)) out.push(settings.negative);
       else if (/prompt/.test(key)) out.push(settings.prompt);
       else if (/random/.test(key)) out.push(settings.randomize);

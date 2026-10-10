@@ -17,7 +17,19 @@ export const ENGINES = [
     host: "https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space",
     label: "Wan 2.2 14B Fast · pool A",
   },
-  // ── validated alternates (filled from the fleet probe report) ─────────
+  // ── validated by tools/probe_fleet.py (I2V endpoint + anonymous access) ──
+  {
+    id: "wan-fast-b",
+    host: "https://upsampler-wan-2-2-14b-image-to-video.hf.space",
+    label: "Wan 2.2 14B · pool B",
+  },
+  {
+    id: "wan-fast-c",
+    host: "https://tinchote-wan-2-2-14b-image-to-video.hf.space",
+    label: "Wan 2.2 14B · pool C",
+  },
+  // ── non-ZeroGPU members (no platform quota) are appended automatically
+  //    by CI once the fleet probe proves them ──────────────────────────────
 ];
 
 /** How long an engine stays parked after a failure kind (ms). */

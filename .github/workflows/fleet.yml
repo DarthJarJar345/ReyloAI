@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "tools/probe_fleet.py"
+      - "tools/probe_ms.py"
       - ".github/workflows/fleet.yml"
 
 permissions:
@@ -27,6 +28,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: ModelScope second-pool probe
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python3 -u tools/probe_ms.py 2>&1 | tee ms.log
+
       - name: Run fleet probe
         continue-on-error: true
         run: |
@@ -43,6 +50,8 @@ jobs:
             echo "- utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             echo
             echo '```text'
+            cat ms.log 2>/dev/null || echo "(no ms log)"
+            echo
             cat fleet.log 2>/dev/null || echo "(no log)"
             echo '```'
           } > tools/fleet-report.md
