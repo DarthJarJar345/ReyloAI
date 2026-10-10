@@ -361,15 +361,20 @@ export class GradioSpaceClient {
                   data === null ||
                   data === undefined ||
                   (Array.isArray(data) && data.length === 0);
-                if (out.success === false || empty) {
-                  const errText = cleanErrorMessage(out.error);
-                  const quotaish = /quota|limit|busy|too many|daily/i.test(errText || "");
+                // Gradio 6 puts `success` on the message OR inside output.
+                const successFlag = out.success ?? msg.success;
+                if (successFlag === false || empty) {
+                  const errText =
+                    cleanErrorMessage(out.error) || cleanErrorMessage(msg.error);
+                  const title = String(out.title || msg.title || "");
+                  const quotaish =
+                    /quota|limit|busy|too many|daily/i.test(errText + " " + title);
                   throw new SpaceError(
                     errText ||
                       (quotaish
                         ? "The free shared GPU pool is temporarily exhausted."
                         : "The engine finished without returning a video (transient ZeroGPU blip). An automatic retry usually succeeds."),
-                    { kind: quotaish ? "quota" : "engine", detail: out }
+                    { kind: quotaish ? "quota" : "engine", detail: { out, title } }
                   );
                 }
                 return { data, raw: msg, event_id: msg.event_id };

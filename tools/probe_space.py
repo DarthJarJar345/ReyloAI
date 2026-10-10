@@ -36,9 +36,11 @@ UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
 
 MIRRORS = [
     ("jsdelivr", "https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v1/index.html"),
-    ("jsdelivr-css", "https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v1/assets/css/style.css"),
+    ("jsdelivr-htm", "https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v1/index.htm"),
     ("statically", "https://cdn.statically.io/gh/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
-    ("githack", "https://raw.githack.com/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
+    ("githack-raw", "https://raw.githack.com/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
+    ("githack-cdn", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
+    ("githack-apex", "https://githack.com/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
     ("gh-raw", "https://raw.githubusercontent.com/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
 ]
 
@@ -103,9 +105,14 @@ def probe_mirrors() -> None:
             body = resp.read(400)
             resp.close()
             verdict = "WEBSITE" if ct and "text/html" in ct else "NOT-HTML"
-            print(f"  {name:14s} HTTP {resp.status}  content-type={ct!r}  -> {verdict}")
-            if verdict == "NOT-HTML":
-                print(f"      first bytes: {body[:120]!r}")
+            interstitial = b"External Content Notice" in body or b"One more step" in body
+            ours = b"Reylo AI Video Generator" in body
+            print(f"  {name:14s} HTTP {resp.status}  content-type={ct!r}  -> {verdict}"
+                  f"  interstitial={interstitial}  ours={ours}")
+            if verdict == "NOT-HTML" or interstitial:
+                print(f"      first bytes: {body[:200]!r}")
+            if name == "jsdelivr" and verdict == "NOT-HTML":
+                failures.append("jsdelivr serves index.html as non-HTML")
             if name == "jsdelivr" and verdict == "NOT-HTML":
                 failures.append("jsdelivr serves index.html as non-HTML")
         except urllib.error.HTTPError as e:
