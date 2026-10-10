@@ -1,9 +1,9 @@
 # Space API probe report
 
-- run: 38089878552 / attempt 1
+- run: 38089990137 / attempt 1
 - ref: arena/50b14632-reyloai
-- sha: 32f1f27175d5acfafcacaa7efbafa2a0a7d6421d
-- utc: 2026-10-10T22:02:48Z
+- sha: aeef7789cf7a1f3787c115da39aa881560a3e8b7
+- utc: 2026-10-10T22:04:27Z
 
 ```text
 Space : https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space
@@ -23,6 +23,10 @@ Gens  : 4
   githack-apex   HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE  interstitial=False  ours=True
   gh-raw         HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
       first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>Reylo AI Video Generator \xe2\x80\x94 free AI image-to-video (Wa'
+  githack-css    HTTP 200  content-type='text/css; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'/* ================================================================\n   Reylo AI Video Generator \xe2\x80\x94 design system\n   deep-space dark \xc2\xb7 dual-saber gradient (blue \xe2\x87\x84 red) \xc2\xb7 glass panels\n   =========='
+  githack-js     HTTP 200  content-type='application/javascript; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'/**\n * Reylo AI Video Generator \xe2\x80\x94 application logic.\n * 100% client-side: the browser talks straight to the Hugging Face Space\n * (Wan 2.2 14B Fast, ZeroGPU). No backend, no keys, no cost.\n */\n\nimpo'
 
 ==============================================================================
 ### 1) GET config (anonymous, browser Origin)
@@ -53,125 +57,125 @@ Gens  : 4
 ==============================================================================
 ### 4) 4 consecutive anonymous generations
 ==============================================================================
-  gen#1: joined event_id=8a046b47409147c4b1084989da43d860
-    [  0.5s] estimation rank=0 eta=67.52886096221668
-    [  0.5s] process_starts rank=None eta=67.52886096221668
-    [  3.7s] progress 10 desc=ZeroGPU init
-    [  4.0s] progress 20 desc=ZeroGPU init
-    [  4.2s] progress 21 desc=ZeroGPU init
-    [  4.3s] progress 22 desc=ZeroGPU init
-    [  4.3s] progress 23 desc=ZeroGPU init
-    [  4.3s] progress 24 desc=ZeroGPU init
-    [  4.4s] progress 25 desc=ZeroGPU init
-    [  4.4s] progress 26 desc=ZeroGPU init
-    [  4.4s] progress 27 desc=ZeroGPU init
-    [  4.4s] progress 28 desc=ZeroGPU init
-    [  4.5s] progress 29 desc=ZeroGPU init
-    [  4.5s] progress 30 desc=ZeroGPU init
-    [  4.5s] progress 31 desc=ZeroGPU init
-    [  4.5s] progress 32 desc=ZeroGPU init
-    [  4.6s] progress 33 desc=ZeroGPU init
-    [  4.6s] progress 34 desc=ZeroGPU init
-    [  4.6s] progress 35 desc=ZeroGPU init
-    [  4.7s] progress 36 desc=ZeroGPU init
-    [  4.7s] progress 37 desc=ZeroGPU init
-    [  4.7s] progress 38 desc=ZeroGPU init
-    [  4.8s] progress 39 desc=ZeroGPU init
-    [  4.8s] progress 40 desc=ZeroGPU init
-    [  4.8s] progress 41 desc=ZeroGPU init
-    [  4.8s] progress 42 desc=ZeroGPU init
-    [  4.9s] progress 43 desc=ZeroGPU init
-    [  4.9s] progress 44 desc=ZeroGPU init
-    [  5.0s] progress 45 desc=ZeroGPU init
-    [  5.0s] progress 46 desc=ZeroGPU init
-    [  5.0s] progress 47 desc=ZeroGPU init
-    [  5.0s] progress 48 desc=ZeroGPU init
-    [  5.1s] progress 49 desc=ZeroGPU init
-    [  5.1s] progress 50 desc=ZeroGPU init
-    [  5.1s] progress 51 desc=ZeroGPU init
-    [  5.1s] progress 52 desc=ZeroGPU init
-    [  5.2s] progress 53 desc=ZeroGPU init
-    [  5.2s] progress 54 desc=ZeroGPU init
-    [  5.2s] progress 55 desc=ZeroGPU init
-    [  5.3s] progress 56 desc=ZeroGPU init
-    [  5.3s] progress 57 desc=ZeroGPU init
-    [  5.3s] progress 58 desc=ZeroGPU init
-    [  5.4s] progress 59 desc=ZeroGPU init
-    [  5.4s] progress 60 desc=ZeroGPU init
-    [  5.4s] progress 61 desc=ZeroGPU init
-    [  5.4s] progress 62 desc=ZeroGPU init
-    [  5.5s] progress 63 desc=ZeroGPU init
-    [  5.5s] progress 64 desc=ZeroGPU init
-    [  5.5s] progress 65 desc=ZeroGPU init
-    [  5.5s] progress 66 desc=ZeroGPU init
-    [  5.6s] progress 67 desc=ZeroGPU init
-    [  5.6s] progress 68 desc=ZeroGPU init
-    [  5.6s] progress 69 desc=ZeroGPU init
-    [  5.6s] progress 70 desc=ZeroGPU init
-    [  5.7s] progress 71 desc=ZeroGPU init
-    [  5.7s] progress 72 desc=ZeroGPU init
-    [  5.7s] progress 73 desc=ZeroGPU init
-    [  5.7s] progress 74 desc=ZeroGPU init
-    [  5.8s] progress 75 desc=ZeroGPU init
-    [  5.8s] progress 76 desc=ZeroGPU init
-    [  5.8s] progress 77 desc=ZeroGPU init
-    [  5.8s] progress 78 desc=ZeroGPU init
-    [  5.9s] progress 79 desc=ZeroGPU init
-    [  5.9s] progress 80 desc=ZeroGPU init
-    [  5.9s] progress 81 desc=ZeroGPU init
-    [  5.9s] progress 82 desc=ZeroGPU init
-    [  6.0s] progress 83 desc=ZeroGPU init
-    [  6.0s] progress 84 desc=ZeroGPU init
-    [  6.0s] progress 85 desc=ZeroGPU init
-    [  6.0s] progress 86 desc=ZeroGPU init
-    [  6.1s] progress 87 desc=ZeroGPU init
-    [  6.1s] progress 88 desc=ZeroGPU init
-    [  6.1s] progress 89 desc=ZeroGPU init
-    [  6.1s] progress 90 desc=ZeroGPU init
-    [  6.2s] progress 91 desc=ZeroGPU init
-    [  6.2s] progress 92 desc=ZeroGPU init
-    [  6.2s] progress 93 desc=ZeroGPU init
-    [  6.3s] progress 94 desc=ZeroGPU init
-    [  6.3s] progress 95 desc=ZeroGPU init
-    [  6.3s] progress 96 desc=ZeroGPU init
-    [  6.4s] progress 97 desc=ZeroGPU init
-    [  6.4s] progress 98 desc=ZeroGPU init
-    [  6.4s] progress 99 desc=ZeroGPU init
-    [  6.4s] progress 100 desc=ZeroGPU init
-    [  6.4s] progress None desc=None
-    [  7.4s] progress 0 desc=None
-    [  8.3s] progress 1 desc=None
-    [  8.6s] progress 2 desc=None
-    [  9.2s] progress 3 desc=None
-    [  9.8s] progress None desc=None
-    [ 10.9s] process_completed success=None data_len=2 error='None'
-  gen#1: OK in 11.2s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
-  gen#2: joined event_id=b0b5e6783a4f4c6cb50e119e9a6e12aa
-    [  0.4s] estimation rank=0 eta=67.34566686009667
-    [  0.4s] process_starts rank=None eta=67.34566686009667
-    [  0.8s] progress 0 desc=None
-    [  1.4s] progress 1 desc=None
-    [  1.9s] progress 2 desc=None
-    [  2.5s] progress 3 desc=None
-    [  3.1s] progress None desc=None
-    [  4.5s] process_completed success=None data_len=2 error='None'
-  gen#2: OK in 4.9s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
-  gen#3: joined event_id=b7ae51121d9b436ab3808cd7ac21f4aa
-    [  0.4s] estimation rank=0 eta=67.1478037848976
-    [  0.4s] process_starts rank=None eta=67.1478037848976
+  gen#1: joined event_id=5a2997db79d34beebae9abbd1c388e8a
+    [  0.1s] estimation rank=0 eta=50.76624926997394
+    [  0.1s] process_starts rank=None eta=50.76624926997394
+    [  1.0s] progress 10 desc=ZeroGPU init
+    [  1.4s] progress 20 desc=ZeroGPU init
+    [  1.7s] progress 21 desc=ZeroGPU init
+    [  1.7s] progress 22 desc=ZeroGPU init
+    [  1.7s] progress 23 desc=ZeroGPU init
+    [  1.7s] progress 24 desc=ZeroGPU init
+    [  1.7s] progress 25 desc=ZeroGPU init
+    [  1.8s] progress 26 desc=ZeroGPU init
+    [  1.8s] progress 27 desc=ZeroGPU init
+    [  1.8s] progress 28 desc=ZeroGPU init
+    [  1.8s] progress 29 desc=ZeroGPU init
+    [  1.9s] progress 30 desc=ZeroGPU init
+    [  1.9s] progress 31 desc=ZeroGPU init
+    [  1.9s] progress 32 desc=ZeroGPU init
+    [  1.9s] progress 33 desc=ZeroGPU init
+    [  2.0s] progress 34 desc=ZeroGPU init
+    [  2.0s] progress 35 desc=ZeroGPU init
+    [  2.0s] progress 36 desc=ZeroGPU init
+    [  2.0s] progress 37 desc=ZeroGPU init
+    [  2.1s] progress 38 desc=ZeroGPU init
+    [  2.1s] progress 39 desc=ZeroGPU init
+    [  2.1s] progress 40 desc=ZeroGPU init
+    [  2.2s] progress 41 desc=ZeroGPU init
+    [  2.2s] progress 42 desc=ZeroGPU init
+    [  2.2s] progress 43 desc=ZeroGPU init
+    [  2.2s] progress 44 desc=ZeroGPU init
+    [  2.3s] progress 45 desc=ZeroGPU init
+    [  2.3s] progress 46 desc=ZeroGPU init
+    [  2.3s] progress 47 desc=ZeroGPU init
+    [  2.3s] progress 48 desc=ZeroGPU init
+    [  2.3s] progress 49 desc=ZeroGPU init
+    [  2.4s] progress 50 desc=ZeroGPU init
+    [  2.4s] progress 51 desc=ZeroGPU init
+    [  2.4s] progress 52 desc=ZeroGPU init
+    [  2.4s] progress 53 desc=ZeroGPU init
+    [  2.4s] progress 54 desc=ZeroGPU init
+    [  2.5s] progress 55 desc=ZeroGPU init
+    [  2.5s] progress 56 desc=ZeroGPU init
+    [  2.5s] progress 57 desc=ZeroGPU init
+    [  2.5s] progress 58 desc=ZeroGPU init
+    [  2.6s] progress 59 desc=ZeroGPU init
+    [  2.6s] progress 60 desc=ZeroGPU init
+    [  2.6s] progress 61 desc=ZeroGPU init
+    [  2.6s] progress 62 desc=ZeroGPU init
+    [  2.7s] progress 63 desc=ZeroGPU init
+    [  2.7s] progress 64 desc=ZeroGPU init
+    [  2.7s] progress 65 desc=ZeroGPU init
+    [  2.7s] progress 66 desc=ZeroGPU init
+    [  2.7s] progress 67 desc=ZeroGPU init
+    [  2.8s] progress 68 desc=ZeroGPU init
+    [  2.8s] progress 69 desc=ZeroGPU init
+    [  2.8s] progress 70 desc=ZeroGPU init
+    [  2.8s] progress 71 desc=ZeroGPU init
+    [  2.9s] progress 72 desc=ZeroGPU init
+    [  2.9s] progress 73 desc=ZeroGPU init
+    [  2.9s] progress 74 desc=ZeroGPU init
+    [  2.9s] progress 75 desc=ZeroGPU init
+    [  3.0s] progress 76 desc=ZeroGPU init
+    [  3.0s] progress 77 desc=ZeroGPU init
+    [  3.0s] progress 78 desc=ZeroGPU init
+    [  3.0s] progress 79 desc=ZeroGPU init
+    [  3.1s] progress 80 desc=ZeroGPU init
+    [  3.1s] progress 81 desc=ZeroGPU init
+    [  3.1s] progress 82 desc=ZeroGPU init
+    [  3.1s] progress 83 desc=ZeroGPU init
+    [  3.2s] progress 84 desc=ZeroGPU init
+    [  3.2s] progress 85 desc=ZeroGPU init
+    [  3.2s] progress 86 desc=ZeroGPU init
+    [  3.2s] progress 87 desc=ZeroGPU init
+    [  3.3s] progress 88 desc=ZeroGPU init
+    [  3.3s] progress 89 desc=ZeroGPU init
+    [  3.3s] progress 90 desc=ZeroGPU init
+    [  3.3s] progress 91 desc=ZeroGPU init
+    [  3.4s] progress 92 desc=ZeroGPU init
+    [  3.4s] progress 93 desc=ZeroGPU init
+    [  3.4s] progress 94 desc=ZeroGPU init
+    [  3.4s] progress 95 desc=ZeroGPU init
+    [  3.5s] progress 96 desc=ZeroGPU init
+    [  3.5s] progress 97 desc=ZeroGPU init
+    [  3.5s] progress 98 desc=ZeroGPU init
+    [  3.5s] progress 99 desc=ZeroGPU init
+    [  3.6s] progress 100 desc=ZeroGPU init
+    [  3.6s] progress None desc=None
+    [  4.6s] progress 0 desc=None
+    [  5.2s] progress 1 desc=None
+    [  5.7s] progress 2 desc=None
+    [  6.3s] progress 3 desc=None
+    [  6.8s] progress None desc=None
+    [  8.0s] process_completed success=None data_len=2 error='None'
+  gen#1: OK in 8.1s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#2: joined event_id=4cd412bd98434961a7b7ad683259b47e
+    [  0.3s] estimation rank=0 eta=50.14352991183599
+    [  0.3s] process_starts rank=None eta=50.14352991183599
     [  0.9s] progress 0 desc=None
     [  1.5s] progress 1 desc=None
     [  2.0s] progress 2 desc=None
     [  2.6s] progress 3 desc=None
     [  3.1s] progress None desc=None
     [  4.1s] process_completed success=None data_len=2 error='None'
-  gen#3: OK in 4.3s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
-  gen#4: joined event_id=09fa4632127e461c866061d67a70ff21
-    [  0.4s] estimation rank=0 eta=67.01712473758981
-    [  0.4s] process_starts rank=None eta=67.01712473758981
-    [  0.4s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#2: OK in 4.1s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#3: joined event_id=3b7c3563996e4cf78b23dbe9055fe308
+    [  0.1s] estimation rank=0 eta=49.59871048646815
+    [  0.1s] process_starts rank=None eta=49.59871048646815
+    [  0.7s] progress 0 desc=None
+    [  1.3s] progress 1 desc=None
+    [  1.9s] progress 2 desc=None
+    [  2.5s] progress 3 desc=None
+    [  3.0s] progress None desc=None
+    [  4.0s] process_completed success=None data_len=2 error='None'
+  gen#3: OK in 4.1s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#4: joined event_id=80abeaedbed0454aacd957a452efb85a
+    [  0.5s] estimation rank=0 eta=48.879809466275304
+    [  0.5s] process_starts rank=None eta=48.879809466275304
+    [  0.5s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
   gen#4: NO VIDEO URL. full process_completed payload:
-    {"msg": "process_completed", "event_id": "09fa4632127e461c866061d67a70ff21", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+    {"msg": "process_completed", "event_id": "80abeaedbed0454aacd957a452efb85a", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
 
   generations succeeded: 3/4
 
@@ -185,4 +189,4 @@ FAILURES:
   - only 3/4 generations succeeded
 ```
 total 36
--rw-r--r-- 1 runner runner 34846 Oct 10 22:02 probe_output.mp4
+-rw-r--r-- 1 runner runner 34846 Oct 10 22:04 probe_output.mp4
