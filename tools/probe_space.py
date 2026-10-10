@@ -42,6 +42,8 @@ MIRRORS = [
     ("githack-cdn", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
     ("githack-apex", "https://githack.com/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
     ("gh-raw", "https://raw.githubusercontent.com/DarthJarJar345/ReyloAI/reylo-v1/index.html"),
+    ("githack-css", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v1/assets/css/style.css"),
+    ("githack-js", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v1/assets/js/app.js"),
 ]
 
 failures = []

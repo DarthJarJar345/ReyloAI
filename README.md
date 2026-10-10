@@ -2,8 +2,11 @@
 
 **Turn any image into living cinema — 100% free, no account, no watermark, no backend.**
 
-Live site (public, free, zero-config CDN mirror of the `reylo-v1` release tag):
-**https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v1/index.html**
+Live site (public, free, zero-config CDN mirror of the `reylo-v2` release tag):
+**https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v2/index.html**
+
+(jsDelivr/statically were rejected as public URLs because they serve `.html` as
+`text/plain` — verified by the CI probe — which makes browsers show source text.)
 
 GitHub Pages (`https://darthjarjar345.github.io/ReyloAI/`) is auto-provisioned by
 `.github/workflows/pages.yml` whenever an admin token is available to the CI.
