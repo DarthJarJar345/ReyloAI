@@ -57,14 +57,39 @@ jobs:
             cat probe.log 2>/dev/null || echo "(no log produced)"
             echo '```'
           } > tools/probe-report.md
+          cp probe.log tools/probe.log 2>/dev/null || true
           if [ -f probe_output.mp4 ]; then
-            ls -l probe_output.mp4 >> tools/probe-report.md
             mkdir -p tools/probe-artifacts
             cp probe_output.mp4 tools/probe-artifacts/probe_output.mp4
+            ls -l tools/probe-artifacts/ >> tools/probe-report.md
           fi
+          # ALWAYS publish the report as a commit comment first (reliable read channel)
+          python3 - <<'PY' || true
+          import json, os, subprocess, urllib.request
+          body = open("tools/probe-report.md").read()
+          sha = os.environ["GITHUB_SHA"]
+          repo = os.environ["GITHUB_REPOSITORY"]
+          token = os.environ["GITHUB_TOKEN"]
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/commits/{sha}/comments",
+              data=json.dumps({"body": body[:60000]}).encode(),
+              headers={"Authorization": f"Bearer {token}",
+                       "Accept": "application/vnd.github+json",
+                       "User-Agent": "probe-bot"},
+              method="POST")
+          try:
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  print("commit comment published:", r.status)
+          except Exception as e:
+              print("commit comment failed:", e)
+          PY
           git config user.name "reylo-probe[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f tools/probe-report.md tools/probe-artifacts 2>/dev/null || true
-          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git add -f tools/probe-report.md || true
+          git add -f tools/probe.log || true
+          git add -f tools/probe-artifacts || true
           git commit -m "chore(probe): report from run ${{ github.run_id }}.${{ github.run_attempt }}" || echo "nothing to commit"
-          git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed"
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" && echo "PUSH_OK" || echo "PUSH_FAILED"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
