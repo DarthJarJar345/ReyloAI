@@ -231,6 +231,14 @@ function setModel(model) {
   el.modelNote.textContent = familyAvailable(model)
     ? `${info.blurb}${info.needsImage ? "" : " — a prompt alone is enough; add a source frame for image-to-video."}`
     : `${info.name} engines are being validated by the site's CI probes — they join the fleet automatically.`;
+  // image-optional families: relabel step 01 and widen the duration range
+  const srcTitle = $("#source-title");
+  if (srcTitle) srcTitle.textContent = info.needsImage ? "Source frame" : "Source frame (optional)";
+  if (el.duration) {
+    el.duration.max = info.needsImage ? "5" : "10";
+    if (Number(el.duration.value) > Number(el.duration.max)) el.duration.value = el.duration.max;
+    el.duration.dispatchEvent(new Event("input"));
+  }
   el.generate.disabled = state.generating || !familyAvailable(model);
 }
 function setEngineBadge(text) {
