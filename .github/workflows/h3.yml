@@ -1,0 +1,72 @@
+name: H3+LTX Fleet Expansion Probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/probe_h3.py"
+      - ".github/workflows/h3.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: h3-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run H3/LTX expansion probe
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python3 -u tools/probe_h3.py 2>&1 | tee h3.log
+
+      - name: Publish report
+        if: always()
+        run: |
+          {
+            echo "# H3/LTX fleet expansion report"
+            echo
+            echo "- run: ${{ github.run_id }}.${{ github.run_attempt }} · ref: ${{ github.ref_name }}"
+            echo "- utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo
+            echo '```text'
+            cat h3.log 2>/dev/null || echo "(no log)"
+            echo '```'
+          } > tools/h3-report.md
+          git config user.name "reylo-probe[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f tools/h3-report.md || true
+          git commit -m "chore(h3): report from run ${{ github.run_id }}.${{ github.run_attempt }}" || echo "nothing to commit"
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" && echo PUSH_OK || echo PUSH_FAILED
+          python3 - <<'PY' || true
+          import json, os, urllib.request
+          body = open("tools/h3-report.md").read()
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/commits/{os.environ['GITHUB_SHA']}/comments",
+              data=json.dumps({"body": body[:60000]}).encode(),
+              headers={"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                       "Accept": "application/vnd.github+json",
+                       "User-Agent": "h3-bot"},
+              method="POST")
+          try:
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  print("commit comment published:", r.status)
+          except Exception as e:
+              print("commit comment failed:", e)
+          PY
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
