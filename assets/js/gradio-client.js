@@ -133,13 +133,16 @@ export class GradioSpaceClient {
   }
 
   /**
-   * Discover the image->video endpoint of this space.
+   * Discover a video-generation endpoint of this space.
    * Strategy: /config (always present) -> components + dependencies + labels.
-   * Returns { endpoint, fnIndex, params:[{name,label,required,comp}] } or null.
+   * mode: "i2v" (image+video out), "t2v" (text-only in + video out),
+   *       "auto" (prefer i2v, fall back to t2v).
+   * Returns { endpoint, fnIndex, params:[{name,label,required,comp,def,min,max}] } or null.
    */
-  async discoverI2V() {
-    if (this._i2v !== undefined) return this._i2v;
-    this._i2v = (async () => {
+  async discoverVideo(mode = "i2v") {
+    this._disc = this._disc || {};
+    if (this._disc[mode] !== undefined) return this._disc[mode];
+    this._disc[mode] = (async () => {
       const cfg = await this.config().catch(() => null);
       if (!cfg) return null;
       const comps = new Map();
@@ -147,62 +150,91 @@ export class GradioSpaceClient {
         comps.set(c.id, c);
       }
       const deps = cfg._resolved?.deps || cfg.dependencies || [];
+      let i2v = null;
+      let t2v = null;
       for (let i = 0; i < deps.length; i += 1) {
         const d = deps[i];
         if (d.api_visibility && d.api_visibility !== "public") continue;
+        if (d.queue === false) continue;
         const inputs = (d.inputs || []).map((id) => comps.get(id)).filter(Boolean);
         const outputs = (d.outputs || []).map((id) => comps.get(id)).filter(Boolean);
-        const hasImg = inputs.some((c) => (c.type || "") === "image");
         const hasVid = outputs.some((c) => (c.type || "") === "video");
-        if (!hasImg || !hasVid) continue;
+        if (!hasVid) continue;
+        const hasImg = inputs.some((c) => (c.type || "") === "image");
+        const hasTxt = inputs.some((c) => (c.type || "") === "textbox");
+        if (!hasImg && !hasTxt) continue;
         const params = inputs.map((c) => ({
           name: c.props?.name || c.type || "",
           label: String(c.props?.label || c.props?.name || c.type || ""),
           comp: c.type,
           def: c.props?.value ?? null,
+          min: c.props?.minimum ?? null,
+          max: c.props?.maximum ?? null,
           required: true,
         }));
         const apiName = d.api_name ? `/${String(d.api_name).replace(/^\/+/, "")}` : null;
-        return { endpoint: apiName || `/fn_${i}`, fnIndex: i, params };
+        const found = { endpoint: apiName || `/fn_${i}`, fnIndex: i, params };
+        if (hasImg && !i2v) i2v = found;
+        else if (!hasImg && hasTxt && !t2v) t2v = found;
       }
-      return null;
+      if (mode === "t2v") return t2v;
+      if (mode === "i2v") return i2v;
+      return i2v || t2v; // auto
     })();
-    this._i2v.catch(() => {
-      this._i2v = undefined;
+    this._disc[mode].catch(() => {
+      this._disc[mode] = undefined;
     });
-    return this._i2v;
+    return this._disc[mode];
+  }
+
+  /** Back-compat alias. */
+  discoverI2V() {
+    return this.discoverVideo("i2v");
   }
 
   /**
-   * Build a positional payload for an I2V endpoint from UI settings.
-   * Maps parameters by name OR UI label keywords, so any Gradio I2V
-   * space can join the fleet without hand-written adapters.
+   * Build a positional payload for a video endpoint from UI settings.
+   * Maps parameters by name OR UI label keywords, so any Gradio video
+   * space (Wan, MiniMax-H3, LTX, …) can join the fleet without adapters.
+   * Numeric values are clamped to the engine's own slider range.
    */
-  buildI2VPayload(discovery, settings, imageFileData, framesFor) {
+  buildI2VPayload(discovery, settings, imageFileData, framesFor, engine = null) {
     const out = [];
     let imageUsed = false;
+    const fps = (engine && engine.fps) || 16;
+    const clamp = (p, v) => {
+      const n = Number(v);
+      if (!Number.isFinite(n)) return p.def ?? null;
+      if (p.min !== null && p.min !== undefined && n < Number(p.min)) return Number(p.min);
+      if (p.max !== null && p.max !== undefined && n > Number(p.max)) return Number(p.max);
+      return n;
+    };
     for (const p of discovery.params) {
       const key = `${p.name} ${p.label}`.toLowerCase();
       if (p.comp === "image") {
-        // first image input = source frame; extra ones (end/mask image) stay default
-        out.push(imageUsed ? (p.def ?? null) : imageFileData);
-        imageUsed = true;
+        // first image input = source frame; extra ones (end/mask/ref) stay default
+        if (!imageUsed && imageFileData) {
+          imageUsed = true;
+          out.push(imageFileData);
+        } else {
+          out.push(p.def ?? null);
+        }
         continue;
       }
       if (/negative/.test(key)) out.push(settings.negative);
-      else if (/prompt/.test(key)) out.push(settings.prompt);
       else if (/random/.test(key)) out.push(settings.randomize);
-      else if (/seed/.test(key)) out.push(settings.seed);
-      else if (/step/.test(key)) out.push(settings.steps);
-      else if (/duration|second/.test(key)) out.push(settings.duration);
-      else if (/guidance.*(2|low)/.test(key)) out.push(settings.guidance2);
-      else if (/guidance/.test(key)) out.push(settings.guidance);
-      else if (/frames/.test(key)) out.push(framesFor(settings.duration));
-      else if (/width/.test(key)) out.push(settings.imageWidth || 832);
-      else if (/height/.test(key)) out.push(settings.imageHeight || 480);
-      else if (p.comp === "textbox" && /prompt|descri/.test(key)) out.push(settings.prompt);
-      else if (p.def !== null && p.def !== undefined) {
-        out.push(p.def); // honour the engine's own default for exotic inputs
+      else if (/seed/.test(key)) out.push(clamp(p, settings.seed));
+      else if (/step/.test(key)) out.push(clamp(p, settings.steps));
+      else if (/audio/.test(key) && p.comp === "checkbox") out.push(p.def ?? true);
+      else if (/duration|second/.test(key)) out.push(clamp(p, settings.duration));
+      else if (/frames?|length/.test(key)) out.push(clamp(p, Math.round(settings.duration * fps)));
+      else if (/(guidance|cfg).*(2|low)/.test(key)) out.push(clamp(p, settings.guidance2));
+      else if (/guidance|cfg|scale/.test(key)) out.push(clamp(p, settings.guidance));
+      else if (/prompt|descri|caption/.test(key) && p.comp === "textbox") out.push(settings.prompt);
+      else if (/width|height|resolution|aspect|fps|frame rate|scheduler|lora|strength|denois|motion|bucket|style/.test(key)) {
+        out.push(p.def ?? null); // respect the engine's own tuning for exotic inputs
+      } else if (p.def !== null && p.def !== undefined) {
+        out.push(p.def); // honour the engine's own default for anything else
       } else {
         if (p.required && p.comp !== "image") {
           throw new SpaceError(`Engine needs unsupported input "${p.label || p.name}".`, {

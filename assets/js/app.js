@@ -12,6 +12,7 @@ import {
 } from "./gradio-client.js";
 import {
   ENGINES,
+  MODEL_INFO,
   BLOCK_TTL,
   loadBlocked,
   saveBlocked,
@@ -139,6 +140,9 @@ const el = {
   galleryUsage: $("#gallery-usage"),
   statusPill: $("#engine-pill"),
   statusDot: $("#engine-dot"),
+  modelPick: $("#model-pick"),
+  modelNote: $("#model-note"),
+  audioToggle: $("#audio-toggle"),
   toasts: $("#toasts"),
   modal: $("#modal"),
   modalVideo: $("#modal-video"),
@@ -148,8 +152,11 @@ const el = {
 
 /* ---------------------------------------------------------------- state */
 
+const MODEL_KEY = "reylo.model";
+
 const state = {
   image: null, // { blob, dataUrl, name, width, height }
+  model: MODEL_INFO[localStorage.getItem(MODEL_KEY)] ? localStorage.getItem(MODEL_KEY) : "wan",
   generating: false,
   abort: null,
   session: newSessionHash(),
@@ -183,8 +190,9 @@ function markBlocked(host, kind) {
   blocked[host] = { kind, until: Date.now() + ttl };
   saveBlocked(blocked);
 }
-function engineOrder() {
-  const list = [...ENGINES];
+function engineOrder(model = state.model) {
+  const list = ENGINES.filter((e) => (e.family || "wan") === model);
+  if (!list.length) return [];
   const last = lastGoodEngine();
   if (last) {
     const i = list.findIndex((e) => e.host === last);
@@ -192,9 +200,38 @@ function engineOrder() {
   }
   const open = list.filter((e) => !blocked[e.host]);
   if (open.length) return open;
-  blocked = {}; // everything parked (quota windows expired elsewhere?) -> reset
+  // every engine of this family is parked -> give the family a fresh chance
+  for (const e of list) delete blocked[e.host];
   saveBlocked(blocked);
-  return list;
+  return [...list];
+}
+
+/* ------------------------------------------------------- model families */
+
+function familyAvailable(model) {
+  return ENGINES.some((e) => (e.family || "wan") === model);
+}
+
+function setModel(model) {
+  if (!MODEL_INFO[model]) model = "wan";
+  state.model = model;
+  try { localStorage.setItem(MODEL_KEY, model); } catch { /* noop */ }
+  const info = MODEL_INFO[model];
+  for (const btn of el.modelPick.querySelectorAll(".modelpick__opt")) {
+    const active = btn.dataset.model === model;
+    btn.classList.toggle("is-active", active);
+    btn.setAttribute("aria-checked", String(active));
+    btn.disabled = !familyAvailable(btn.dataset.model);
+    if (btn.disabled && !btn.dataset.noteAdded) {
+      btn.dataset.noteAdded = "1";
+      const s = btn.querySelector("span");
+      if (s) s.textContent += " · no free engines online yet";
+    }
+  }
+  el.modelNote.textContent = familyAvailable(model)
+    ? `${info.blurb}${info.needsImage ? "" : " — a prompt alone is enough; add a source frame for image-to-video."}`
+    : `${info.name} engines are being validated by the site's CI probes — they join the fleet automatically.`;
+  el.generate.disabled = state.generating || !familyAvailable(model);
 }
 function setEngineBadge(text) {
   if (el.engineBadge) el.engineBadge.textContent = text;
@@ -561,7 +598,11 @@ function onStatus(status, detail = {}) {
         : "free shared ZeroGPU pool";
     } else {
       el.statusMain.textContent = "GPU acquired — starting…";
-      el.statusSub.textContent = "loading fp8 Wan 2.2 14B + Lightning LoRA";
+      const info = MODEL_INFO[state.model] || MODEL_INFO.wan;
+      el.statusSub.textContent =
+        state.model === "wan"
+          ? "loading fp8 Wan 2.2 14B + Lightning LoRA"
+          : `loading ${info.name} weights`;
     }
     setProgress(0.02);
     return;
@@ -606,7 +647,8 @@ async function buildImageData() {
 
 async function generate() {
   if (state.generating) return;
-  if (!state.image) {
+  const info = MODEL_INFO[state.model] || MODEL_INFO.wan;
+  if (info.needsImage && !state.image) {
     toast("Pick or drop an image first — or tap a sample below the dropzone.", {
       kind: "error",
     });
@@ -633,8 +675,17 @@ async function generate() {
   el.statusSub.textContent = "waking ZeroGPU if it was asleep";
   startTimer();
 
-  const imageData = await buildImageData();
-  const order = engineOrder();
+  const imageData = state.image ? await buildImageData() : null;
+  const order = engineOrder(state.model);
+  if (!order.length) {
+    state.generating = false;
+    el.generate.disabled = false;
+    el.cancel.hidden = true;
+    toast(`${info.name} has no validated free engines yet — the CI probes add them automatically. Try Wan 2.2 Fast for now.`, { kind: "info", timeout: 9000 });
+    setStage("empty");
+    return;
+  }
+  const discMode = info.needsImage ? "i2v" : (imageData ? "auto" : "t2v");
   let result = null;
   let lastErr = null;
   let usedEngine = null;
@@ -647,7 +698,7 @@ async function generate() {
 
     let discovery = null;
     try {
-      discovery = await engClient.discoverI2V();
+      discovery = await engClient.discoverVideo(discMode);
     } catch (err) {
       lastErr = err;
     }
@@ -659,9 +710,14 @@ async function generate() {
     try {
       payload = engClient.buildI2VPayload(
         discovery,
-        { ...s, imageWidth: state.image.width, imageHeight: state.image.height },
+        {
+          ...s,
+          imageWidth: state.image ? state.image.width : null,
+          imageHeight: state.image ? state.image.height : null,
+        },
         imageData,
-        framesFor
+        framesFor,
+        engine
       );
     } catch (err) {
       lastErr = err;
@@ -742,18 +798,39 @@ async function generate() {
     setLastGoodEngine(usedEngine.host);
     setEngineBadge(`served by ${usedEngine.label}`);
   }
-  await presentResult(result, s);
+  await presentResult(result, s, usedEngine);
 }
 
-async function presentResult(result, settings) {
-  const [videoFile, seed] = result.data;
-  let url = videoFile?.url || (videoFile?.path ? SPACE_HOST + videoFile.path : null);
+async function presentResult(result, settings, engine = null) {
+  const host = engine?.host || SPACE_HOST;
+  const data = Array.isArray(result.data) ? result.data : [result.data];
+  let videoFile = null;
+  let seed = null;
+  for (const item of data) {
+    if (item == null) continue;
+    if (typeof item === "number" && seed === null) {
+      seed = item;
+      continue;
+    }
+    if (typeof item === "object" && (item.url || item.path)) {
+      const ct = String(item.mime_type || "");
+      const u = String(item.url || item.path || "");
+      if (/video/.test(ct) || /\.(mp4|webm|mov)(\?|$)/i.test(u)) {
+        if (!videoFile) videoFile = item;
+      }
+    }
+  }
+  let url =
+    videoFile?.url ||
+    (videoFile?.path
+      ? `${host}/gradio_api/file=${String(videoFile.path).replace(/^\/+/, "")}`
+      : null);
   if (!url) {
     el.errorText.textContent = "The engine returned an empty result. Please retry.";
     setStage("error");
     return;
   }
-  if (url.startsWith("/")) url = SPACE_HOST + url;
+  if (url.startsWith("/")) url = host + url;
 
   el.statusMain.textContent = "Downloading your video…";
   setProgress(1);
@@ -771,15 +848,21 @@ async function presentResult(result, settings) {
   el.video.poster = state.image?.dataUrl || "";
   el.video.muted = true;
   el.video.loop = true;
+  const hasAudio = !!(engine && engine.audio);
+  el.audioToggle.hidden = !hasAudio;
+  el.audioToggle.textContent = "🔇 Enable sound";
   setStage("done");
   el.seedBadge.textContent = `seed ${seed ?? "—"}`;
   el.download.href = blobUrl;
   el.download.download = `reylo-${seed ?? Date.now()}.mp4`;
-  state.last = { blobUrl, blob, seed, prompt: settings.prompt, settings };
+  state.last = { blobUrl, blob, seed, prompt: settings.prompt, settings, model: state.model };
   state.lastSavedId = false;
-  toast("Your video is ready. The light side and the dark side, both in there.", {
-    kind: "success",
-  });
+  toast(
+    hasAudio
+      ? "Your video is ready — with synchronized audio. Hit “Enable sound” to hear it."
+      : "Your video is ready. The light side and the dark side, both in there.",
+    { kind: "success" }
+  );
 
   // auto-save to the local gallery
   try {
@@ -791,6 +874,8 @@ async function presentResult(result, settings) {
       seed: seed ?? 0,
       durationSec: settings.duration,
       steps: settings.steps,
+      model: state.model,
+      engineLabel: engine?.label || null,
     });
     state.lastSavedId = true;
     await renderGallery();
@@ -980,6 +1065,22 @@ async function pollEngine() {
 /* ----------------------------------------------------------------- init */
 
 function initMisc() {
+  // model family picker
+  for (const btn of el.modelPick.querySelectorAll(".modelpick__opt")) {
+    btn.addEventListener("click", () => {
+      if (state.generating) return;
+      setModel(btn.dataset.model);
+    });
+  }
+  setModel(state.model);
+
+  // audio toggle for clips from audio-capable engines (H3 / LTX)
+  el.audioToggle.addEventListener("click", () => {
+    el.video.muted = !el.video.muted;
+    el.audioToggle.textContent = el.video.muted ? "🔇 Enable sound" : "🔊 Sound on";
+    if (!el.video.muted) el.video.play().catch(() => {});
+  });
+
   el.generate.addEventListener("click", generate);
   el.cancel.addEventListener("click", () => state.abort?.abort());
   el.errorRetry.addEventListener("click", generate);
@@ -1016,6 +1117,7 @@ function initMisc() {
         seed: state.last.seed ?? 0,
         durationSec: state.last.settings.duration,
         steps: state.last.settings.steps,
+        model: state.last.model || state.model,
       });
       state.lastSavedId = true;
       await renderGallery();

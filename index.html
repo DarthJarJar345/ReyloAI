@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Reylo AI Video Generator — free AI image-to-video (Wan 2.2 14B Fast)</title>
-  <meta name="description" content="Turn any image into a cinematic AI video, free. Reylo AI Video Generator runs the Wan 2.2 14B Fast model (Lightning LoRA + FP8 + ZeroGPU) on Hugging Face — no account, no credits, no watermark.">
+  <meta name="description" content="Turn any image — or just a prompt — into a cinematic AI video, free. Reylo AI Video Generator runs a fleet of open models on Hugging Face: Wan 2.2 14B Fast, MiniMax-H3 Turbo (video + synchronized audio) and LTX-2 Turbo — no account, no credits, no watermark.">
   <meta name="theme-color" content="#05060a">
   <link rel="canonical" href="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v3/index.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Reylo AI Video Generator">
-  <meta property="og:description" content="Free AI image-to-video in your browser. Powered by Wan 2.2 14B Fast on Hugging Face ZeroGPU.">
+  <meta property="og:description" content="Free AI video in your browser — image-to-video with Wan 2.2 Fast, or video + synchronized audio with MiniMax-H3 Turbo & LTX-2 Turbo on Hugging Face.">
   <meta property="og:url" content="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v3/index.html">
   <meta property="og:image" content="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v2/assets/samples/dune-wanderer.jpg">
   <meta name="twitter:card" content="summary_large_image">
@@ -73,7 +73,7 @@
         <li><strong>16 fps</strong><span>up to 5 s clips</span></li>
         <li><strong>832×480</strong><span>cinematic 16:9</span></li>
         <li><strong>$0</strong><span>always free</span></li>
-        <li><strong>∞</strong><span>rotating engine fleet</span></li>
+        <li><strong>∞</strong><span>fleet · 3 model families</span></li>
       </ul>
     </section>
 
@@ -81,10 +81,26 @@
     <section class="studio" id="studio" aria-label="Video generation studio">
       <div class="studio__head">
         <h2>The Studio</h2>
-        <p>Pick a frame, direct the motion, press generate. A rotating fleet of free engine
+        <p>Pick a model, direct the motion, press generate. A rotating fleet of free engine
            pools does the rest — if one pool runs dry for you, the next one takes over
            automatically.</p>
       </div>
+
+      <div class="modelpick" id="model-pick" role="radiogroup" aria-label="Model family">
+        <button type="button" class="modelpick__opt is-active" data-model="wan" role="radio" aria-checked="true">
+          <strong>Wan 2.2 Fast</strong>
+          <span>image → video · 16 fps · ~4–10s renders</span>
+        </button>
+        <button type="button" class="modelpick__opt" data-model="h3" role="radio" aria-checked="false">
+          <strong>MiniMax-H3 Turbo <em class="modelpick__new">new</em></strong>
+          <span>video + synced audio · image optional</span>
+        </button>
+        <button type="button" class="modelpick__opt" data-model="ltx" role="radio" aria-checked="false">
+          <strong>LTX-2 Turbo <em class="modelpick__new">new</em></strong>
+          <span>video + audio · image optional</span>
+        </button>
+      </div>
+      <p class="modelpick__note mono" id="model-note"></p>
 
       <div class="studio__grid">
         <!-- ------------------------------ input ------------------------------ -->
@@ -222,6 +238,8 @@
           <div class="output-bar">
             <span class="mono seed" id="seed-badge">seed —</span>
             <span class="mono engine-badge" id="engine-badge" title="Which free engine served this clip">engine —</span>
+            <button class="btn btn--tiny audio-toggle" id="audio-toggle" type="button" hidden
+                    title="This clip has synchronized audio">🔇 Enable sound</button>
             <div class="output-bar__btns">
               <a class="btn btn--tiny" id="download" download="reylo-video.mp4" href="#">Download</a>
               <button class="btn btn--tiny btn--ghost" id="save" type="button">Save to gallery</button>
@@ -284,18 +302,23 @@
         <article>
           <h3>A fleet keeps it free for everyone</h3>
           <p>Generation runs on a rotating fleet of free community GPU engines (Hugging Face
-             Spaces hosting Wan2.2 Fast), reached directly from your browser. If one engine is
-             down, asleep or momentarily full, the next one picks up automatically, and the CI in
-             this repo continuously validates and grows the fleet. Heavy back-to-back batches can
-             exhaust the shared free pool for a short window (~an hour) — the site shows a
-             countdown and re-arms on its own; an optional free Hugging Face token lifts even
-             that.</p>
+             Spaces), reached directly from your browser — three model families: <strong>Wan 2.2
+             Fast</strong> (image→video), <strong>MiniMax-H3 Turbo</strong> (video + synchronized
+             stereo audio from text or an image) and <strong>LTX-2 Turbo</strong> (video + audio,
+             distilled fast renders). If one engine is down, asleep or momentarily full, the next
+             one in its family picks up automatically, and the CI in this repo continuously
+             validates and grows the fleet. Heavy back-to-back batches can exhaust the shared
+             free pool for a short window (~an hour) — the site shows a countdown and re-arms on
+             its own; an optional free Hugging Face token lifts even that.</p>
         </article>
       </div>
       <p class="how__credit">
         Engines: <a href="https://huggingface.co/spaces/zerogpu-aoti/wan2-2-fp8da-aoti-faster" rel="noopener" target="_blank">zerogpu-aoti/wan2-2-fp8da-aoti-faster</a> ·
         <a href="https://huggingface.co/spaces/Upsampler/wan-2-2-14b-image-to-video" rel="noopener" target="_blank">Upsampler/wan-2-2-14b-image-to-video</a> ·
         <a href="https://huggingface.co/spaces/Tinchote/wan-2-2-14b-image-to-video" rel="noopener" target="_blank">Tinchote/wan-2-2-14b-image-to-video</a> ·
+        <a href="https://huggingface.co/larryvrh/MiniMax-H3-Turbo-Lora" rel="noopener" target="_blank">MiniMax-H3 Turbo LoRA (larryvrh)</a> ·
+        <a href="https://huggingface.co/MiniMaxAI/MiniMax-H3" rel="noopener" target="_blank">MiniMaxAI/MiniMax-H3</a> ·
+        <a href="https://huggingface.co/spaces/amisima/LTX_2.5_Turbo_Studio" rel="noopener" target="_blank">LTX-2 Turbo spaces</a> ·
         Weights: <a href="https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B" rel="noopener" target="_blank">Wan-AI/Wan2.2-I2V-A14B</a> (Apache-2.0) ·
         LoRA: <a href="https://huggingface.co/Kijai/WanVideo_comfy/tree/main/Wan22-Lightning" rel="noopener" target="_blank">Wan22-Lightning</a>.
         Reylo AI is an independent fan project and is not affiliated with Hugging Face or the model authors.
