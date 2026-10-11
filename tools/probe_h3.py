@@ -28,9 +28,9 @@ import zlib
 ORIGIN = os.environ.get("PROBE_ORIGIN", "https://darthjarjar345.github.io")
 UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
       "Chrome/126.0.0.0 Safari/537.36")
-SSE_TIMEOUT = 330
-GEN_BUDGET = int(os.environ.get("GEN_BUDGET", "6"))   # max spaces to test-generate
-WAKE_BUDGET = 90
+SSE_TIMEOUT = 420
+GEN_BUDGET = int(os.environ.get("GEN_BUDGET", "5"))   # max spaces to test-generate
+WAKE_BUDGET = 45
 
 CANDIDATES = [
     # --- MiniMax-H3 Turbo (video + synchronized audio, 4-8 steps) ---
@@ -71,6 +71,66 @@ CANDIDATES = [
     # --- extra Wan2 family members ---
     "OpenKing/wan2-video-generation",
     "Artist89/wan2-video-generation",
+    # --- second wave: clones of the official H3 app (probe run 38150484826 shape) ---
+    "Opera8/minimax-h3-audio-to-video",
+    "TurboKyle/MiniMax-H3-Turbo-Lora",
+    "ChapouX/MiniMax-H3-Turbo-Lora",
+    "AdamSongjam/MiniMax-H3-Turbo-Lora",
+    "logeshr24/MiniMax-H3-Turbo-Lora",
+    "adamnusic/MiniMax-H3-Turbo-Lora",
+    "ACool007/MiniMax-H3-Turbo-Lora",
+    "Pedrozz/MiniMax-H3-Turbo-Lora",
+    "Menyudadas/MiniMax-H3-Turbo-Lora",
+    "Velvetperil/MiniMax-H3-Turbo-Lora",
+    "edwahh/MiniMax-H3-Turbo-Lora",
+    "avnigashi/MiniMax-H3-Turbo-Lora",
+    "paulo101977/MiniMax-H3-Turbo-Lora",
+    "sitekf/MiniMax-H3-Turbo-Lora",
+    "tk29780930/MiniMax-H3-Turbo-Lora",
+    "eoboygamingrb/MiniMax-H3-Turbo-Lora",
+    "RAGHURAMRAO/MiniMax-H3-Turbo-Lora",
+    "Sairockssss/MiniMax-H3-Turbo-Lora",
+    "Mamasita101/MiniMax-H3-Turbo-Lora",
+    "AlexCdDg/MiniMax-H3-Turbo-Lora",
+    "lbmodels/minimax-h3-ultra-fast",
+    "Radiotomy/Nova-H3",
+    "Lampyy/MiniMax-H3-Turbo-Lora-Vid-Maker",
+    "systemraquel/minimax-h3-ultra-fast",
+    "jojobrentley/minimax-h3-ultra-fast",
+    "abdullahhshafique/minimax-h3-ultra-fast",
+    "Vyro909/MiniMax-H3-Turbo-Lora",
+    "Mystical1309/MiniMax-H3-Turbo-Lora",
+    "Waieloski/MMH3",
+    "Tuflhecl/H4",
+    "Baptistekortex/MiniMax-H3-Turbo-Lora-Lab",
+    "HosseinRzv/minimax-h3-reference-4-step-lora",
+    "owenisas/minimax-h3-profile-base-aoti",
+    "owenisas/minimax-h3-profile-lightx8",
+    "owenisas/minimax-h3-turbo-canary-fl2va",
+    "jli1122/minimax-h3-ultra-fast",
+    "boltguo/minimax-h3-ultra-fast",
+    "slymun/minimax-h3-ultra-fast",
+]
+
+SKIP = {
+    "owenisas/minimax-h3-fl2va",          # proven: requires authenticated two-stage runner
+    "prithivMLmods/MiniMax-H3-Turbo-LoRA-Fast",  # 13 exotic params, sse-deadline last run
+    "mpasila/minimax-h3-reference-4-step-lora",  # 25 params
+    "AlexSinHF/MiniMax-H3-Turbo-Loras",          # 28 params
+    "ifroyou/minimax-h3-ref2va-sketch-p15b",     # unlabeled file inputs
+}
+
+PRIORITY = [
+    "ysharma/gr-workflow-h3-zerogpu",
+    "MiniMaxAI/MiniMax-H3-Turbo-Lora",
+    "akhaliq/MiniMax-H3-Turbo-Lora",
+    "abidlabs/MiniMax-H3-Turbo-Lora",
+    "zakirovrinatik/minimax-h3-audio-to-video",
+    "multimodalart/minimax-h3-audio-to-video",
+    "hugging-apps/h3-world-action-demo",
+    "DeepRat/LTX-Video-ZeroGPU-Optimized",
+    "yuvraj108c/ltx25-bbox-control-demo",
+    "OpenKing/wan2-video-generation",
 ]
 
 
@@ -193,9 +253,10 @@ def min_value(comp, label, png_data_url, png_size):
     if t == "checkbox":
         return bool(props.get("value", False))
     if t == "textbox":
-        if "negative" in key:
-            return str(props.get("value") or "")
-        return str(props.get("value") or "a corgi in a chef hat flips a pancake in a sunny kitchen, sizzling sounds")
+        if any(k in key for k in ("prompt", "descri", "caption", "scene", "motion")) \
+                and "negative" not in key and not props.get("value"):
+            return "a corgi in a chef hat flips a pancake in a sunny kitchen, sizzling sounds"
+        return str(props.get("value") or "")
     if t in ("slider", "number"):
         v = props.get("value")
         mn = props.get("minimum")
@@ -318,11 +379,14 @@ def try_generation(host, fn_index, params, api_name, png, data_url, png_size):
 def main():
     png = make_png()
     data_url = "data:image/png;base64," + base64.b64encode(png).decode()
-    hr(f"1) discover video engines across {len(CANDIDATES)} candidate spaces")
+    hr(f"1) discover video engines across {len(CANDIDATES) - len(SKIP)} candidate spaces")
     discovered = []
     t_start = time.time()
-    for sid in CANDIDATES:
-        if time.time() - t_start > 1500:
+    visit = PRIORITY + [c for c in CANDIDATES if c not in PRIORITY and c not in SKIP]
+    for sid in visit:
+        if sid in SKIP:
+            continue
+        if time.time() - t_start > 1200:
             print("  discovery budget spent, stopping")
             break
         host = host_of(sid)
@@ -347,7 +411,11 @@ def main():
           f"{sum(1 for d in discovered if d[3]=='t2v')} t2v)")
 
     hr(f"2) anonymous minimal generation test (first {GEN_BUDGET}, prefer non-zerogpu)")
-    ordered = sorted(discovered, key=lambda d: 0 if "zerogpu" not in d[6] else 1)
+    def rank(d):
+        sid, host, fn, kind, params, api_name, hw = d
+        pr = PRIORITY.index(sid) if sid in PRIORITY else 100
+        return (pr, 0 if not hw.startswith("zero") else 1, len(params))
+    ordered = sorted(discovered, key=rank)
     results = []
     for sid, host, fn, kind, params, api_name, hw in ordered[:GEN_BUDGET]:
         res, err = try_generation(host, fn, params, api_name, png, data_url, len(png))

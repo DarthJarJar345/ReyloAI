@@ -226,17 +226,23 @@ export class GradioSpaceClient {
       else if (/seed/.test(key)) out.push(clamp(p, settings.seed));
       else if (/step/.test(key)) out.push(clamp(p, settings.steps));
       else if (/audio/.test(key) && p.comp === "checkbox") out.push(p.def ?? true);
-      else if (/duration|second/.test(key)) out.push(clamp(p, settings.duration));
-      else if (/frames?|length/.test(key)) out.push(clamp(p, Math.round(settings.duration * fps)));
+      else if (/duration|second|\(s\)/.test(key)) out.push(clamp(p, settings.duration));
+      else if (/frames?/.test(key) && !/input|use from|reference/.test(key)) {
+        out.push(clamp(p, Math.round(settings.duration * fps)));
+      }
       else if (/(guidance|cfg).*(2|low)/.test(key)) out.push(clamp(p, settings.guidance2));
       else if (/guidance|cfg|scale/.test(key)) out.push(clamp(p, settings.guidance));
-      else if (/prompt|descri|caption/.test(key) && p.comp === "textbox") out.push(settings.prompt);
+      else if (/prompt|descri|caption|scene/.test(key) && p.comp === "textbox") out.push(settings.prompt);
       else if (/width|height|resolution|aspect|fps|frame rate|scheduler|lora|strength|denois|motion|bucket|style/.test(key)) {
         out.push(p.def ?? null); // respect the engine's own tuning for exotic inputs
       } else if (p.def !== null && p.def !== undefined) {
         out.push(p.def); // honour the engine's own default for anything else
+      } else if (p.comp === "textbox") {
+        out.push(""); // empty text is a sane no-op for optional textboxes (LoRA, canvas…)
+      } else if (["image", "audio", "video", "file"].includes(p.comp)) {
+        out.push(null); // optional media inputs stay empty
       } else {
-        if (p.required && p.comp !== "image") {
+        if (p.required) {
           throw new SpaceError(`Engine needs unsupported input "${p.label || p.name}".`, {
             kind: "engine",
           });
