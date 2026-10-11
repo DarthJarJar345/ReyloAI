@@ -25,11 +25,14 @@ import urllib.request
 import uuid
 import zlib
 
+WAV_BYTES = None   # filled in main()
+WAV_DATA_URL = None
+
 ORIGIN = os.environ.get("PROBE_ORIGIN", "https://darthjarjar345.github.io")
 UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
       "Chrome/126.0.0.0 Safari/537.36")
-SSE_TIMEOUT = 420
-GEN_BUDGET = int(os.environ.get("GEN_BUDGET", "5"))   # max spaces to test-generate
+SSE_TIMEOUT = 400
+GEN_BUDGET = int(os.environ.get("GEN_BUDGET", "6"))   # max spaces to test-generate
 WAKE_BUDGET = 45
 
 CANDIDATES = [
@@ -113,6 +116,10 @@ CANDIDATES = [
 ]
 
 SKIP = {
+    "ysharma/gr-workflow-h3-zerogpu",     # proven: needs 362s GPU > anonymous ZeroGPU max
+    "multimodalart/minimax-h3-audio-to-video",   # soundtrack-driven app
+    "zakirovrinatik/minimax-h3-audio-to-video",  # soundtrack-driven app
+    "Opera8/minimax-h3-audio-to-video",          # soundtrack-driven app
     "owenisas/minimax-h3-fl2va",          # proven: requires authenticated two-stage runner
     "prithivMLmods/MiniMax-H3-Turbo-LoRA-Fast",  # 13 exotic params, sse-deadline last run
     "mpasila/minimax-h3-reference-4-step-lora",  # 25 params
@@ -121,15 +128,14 @@ SKIP = {
 }
 
 PRIORITY = [
-    "ysharma/gr-workflow-h3-zerogpu",
     "MiniMaxAI/MiniMax-H3-Turbo-Lora",
     "akhaliq/MiniMax-H3-Turbo-Lora",
     "abidlabs/MiniMax-H3-Turbo-Lora",
-    "zakirovrinatik/minimax-h3-audio-to-video",
-    "multimodalart/minimax-h3-audio-to-video",
     "hugging-apps/h3-world-action-demo",
     "DeepRat/LTX-Video-ZeroGPU-Optimized",
     "yuvraj108c/ltx25-bbox-control-demo",
+    "TurboKyle/MiniMax-H3-Turbo-Lora",
+    "ChapouX/MiniMax-H3-Turbo-Lora",
     "OpenKing/wan2-video-generation",
 ]
 
@@ -164,6 +170,19 @@ def make_png(w=256, h=144):
     p += chunk(b"IDAT", zlib.compress(bytes(raw), 6))
     p += chunk(b"IEND", b"")
     return p
+
+
+def make_wav(seconds=2.0, rate=32000):
+    import math
+    n = int(seconds * rate)
+    frames = bytearray()
+    for i in range(n):
+        v = int(1200 * math.sin(2 * math.pi * 220 * i / rate))  # soft tone, not silence
+        frames += struct.pack("<h", v)
+    hdr = b"RIFF" + struct.pack("<I", 36 + len(frames)) + b"WAVEfmt " + \
+        struct.pack("<IHHIIHH", 16, 1, 1, rate, rate * 2, 2, 16) + \
+        b"data" + struct.pack("<I", len(frames))
+    return bytes(hdr) + bytes(frames)
 
 
 def host_of(sid):
@@ -250,8 +269,13 @@ def min_value(comp, label, png_data_url, png_size):
                 "meta": {"_type": "gradio.FileData"}}
     if t == "video":
         return None
+    if t == "audio":
+        return {"path": None, "url": WAV_DATA_URL, "orig_name": "tone.wav",
+                "mime_type": "audio/wav", "size": len(WAV_BYTES), "is_stream": False,
+                "meta": {"_type": "gradio.FileData"}}
     if t == "checkbox":
-        return bool(props.get("value", False))
+        v = props.get("value")
+        return bool(v) if v is not None else False
     if t == "textbox":
         if any(k in key for k in ("prompt", "descri", "caption", "scene", "motion")) \
                 and "negative" not in key and not props.get("value"):
@@ -260,7 +284,19 @@ def min_value(comp, label, png_data_url, png_size):
     if t in ("slider", "number"):
         v = props.get("value")
         mn = props.get("minimum")
-        if mn is not None and v is not None:
+        if v is None:
+            if "seed" in key:
+                return 42
+            if mn is not None:
+                return mn
+            if any(k in key for k in ("duration", "second", "length")):
+                return 5
+            if "step" in key:
+                return 6
+            if any(k in key for k in ("width", "height")):
+                return 480
+            return 1
+        if mn is not None:
             if "step" in key:
                 return min(max(4, mn), v) if mn <= 4 <= v else mn
             if any(k in key for k in ("duration", "second", "frame", "length")):
@@ -271,6 +307,8 @@ def min_value(comp, label, png_data_url, png_size):
         return v
     if t == "dropdown":
         choices = props.get("choices") or []
+        if props.get("value") is not None:
+            return props.get("value")
         if choices:
             cs = [c[0] if isinstance(c, (list, tuple)) else c for c in choices]
             for c in cs:
@@ -377,6 +415,9 @@ def try_generation(host, fn_index, params, api_name, png, data_url, png_size):
 
 
 def main():
+    global WAV_BYTES, WAV_DATA_URL
+    WAV_BYTES = make_wav()
+    WAV_DATA_URL = "data:audio/wav;base64," + base64.b64encode(WAV_BYTES).decode()
     png = make_png()
     data_url = "data:image/png;base64," + base64.b64encode(png).decode()
     hr(f"1) discover video engines across {len(CANDIDATES) - len(SKIP)} candidate spaces")
@@ -386,7 +427,7 @@ def main():
     for sid in visit:
         if sid in SKIP:
             continue
-        if time.time() - t_start > 1200:
+        if time.time() - t_start > 720:
             print("  discovery budget spent, stopping")
             break
         host = host_of(sid)
