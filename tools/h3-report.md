@@ -1,25 +1,19 @@
 # H3/LTX fleet expansion report
 
-- run: 38152424959.1 · ref: arena/50b14632-reyloai
-- utc: 2026-10-11T16:03:20Z
+- run: 38153970761.1 · ref: arena/50b14632-reyloai
+- utc: 2026-10-11T16:18:40Z
 
 ```text
 
 ==============================================================================
-### 1) discover video engines across 68 candidate spaces
+### 1) discover video engines across 64 candidate spaces
 ==============================================================================
-  I2V ysharma/gr-workflow-h3-zerogpu  hw=zero-a10g fn=4 api=video_soundtrack gradio=6.22.0
-       params=[('image', 'Image'), ('textbox', 'Motion prompt')]
   I2V MiniMaxAI/MiniMax-H3-Turbo-Lora  hw=zero-a10g fn=4 api=output_video gradio=6.25.0
        params=[('textbox', 'Prompt'), ('image', 'First Frame (optional)'), ('image', 'Last Frame (optional)'), ('textbox', 'Canvas'), ('number', 'Duration (s)'), ('number', 'Steps'), ('number', 'Seed'), ('checkbox', 'Upsample Prompt'), ('textbox', 'LoRA')]
   I2V akhaliq/MiniMax-H3-Turbo-Lora  hw=zero-a10g fn=4 api=output_video gradio=6.25.0
        params=[('textbox', 'Prompt'), ('image', 'First Frame (optional)'), ('image', 'Last Frame (optional)'), ('textbox', 'Canvas'), ('number', 'Duration (s)'), ('number', 'Steps'), ('number', 'Seed'), ('checkbox', 'Upsample Prompt'), ('textbox', 'LoRA')]
   I2V abidlabs/MiniMax-H3-Turbo-Lora  hw=zero-a10g fn=4 api=output_video gradio=6.24.0
        params=[('textbox', 'Prompt'), ('image', 'First Frame (optional)'), ('image', 'Last Frame (optional)'), ('textbox', 'Canvas'), ('number', 'Duration (s)'), ('number', 'Steps'), ('number', 'Seed'), ('checkbox', 'Upsample Prompt'), ('textbox', 'LoRA')]
-  I2V zakirovrinatik/minimax-h3-audio-to-video  hw=zero-a10g fn=3 api=generate gradio=6.20.0
-       params=[('textbox', 'Prompt'), ('image', 'First frame'), ('audio', 'Soundtrack'), ('dropdown', 'Canvas'), ('slider', 'Duration (s)'), ('slider', 'Steps'), ('number', 'Seed'), ('checkbox', 'Upsample prompt')]
-  I2V multimodalart/minimax-h3-audio-to-video  hw=zero-a10g fn=3 api=generate gradio=6.20.0
-       params=[('textbox', 'Prompt'), ('image', 'First frame'), ('audio', 'Soundtrack'), ('dropdown', 'Canvas'), ('slider', 'Duration (s)'), ('slider', 'Steps'), ('number', 'Seed'), ('checkbox', 'Upsample prompt')]
   I2V hugging-apps/h3-world-action-demo  hw=zero-a10g fn=7 api=generate gradio=6.26.0
        params=[('textbox', 'Scene description'), ('image', 'First frame'), ('textbox', 'Action script'), ('dropdown', 'Canvas'), ('slider', 'Duration (s)'), ('slider', 'Steps'), ('number', 'Seed'), ('textbox', 'Subject'), ('checkbox', 'Directed attention mask'), ('radio', 'Sampling')]
   T2V DeepRat/LTX-Video-ZeroGPU-Optimized  hw=zero-a10g fn=6 api=text_to_video gradio=5.49.1
@@ -32,6 +26,8 @@
        params=[('textbox', 'Prompt'), ('textbox', 'Objects'), ('slider', 'Box prompt weight'), ('slider', 'Global prompt weight'), ('textbox', 'Negative prompt'), ('number', 'Seed'), ('checkbox', 'Randomize')]
   T2V yuvraj108c/ltx25-bbox-control-demo  hw=zero-a10g fn=6 api=preview_control gradio=6.26.0
        params=[('textbox', 'Objects')]
+  --   TurboKyle/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
+  --   ChapouX/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
   I2V OpenKing/wan2-video-generation  hw=cpu-basic fn=1 api=generate_video gradio=5.49.0
        params=[('textbox', 'Prompt'), ('image', 'Input Image (Optional - for Image-to-Video)'), ('slider', 'Width'), ('slider', 'Height'), ('slider', 'Number of Frames (more frames = longer video)'), ('slider', 'Inference Steps (more steps = better quality, slower)'), ('slider', 'Guidance Scale (higher = closer to prompt)'), ('number', 'Seed (-1 for random)')]
   --   boltguo/minimax-h3-ultra-fast  hw=zero-a10g (wake timeout)
@@ -55,9 +51,6 @@
   --   rahul7star/LTX-2.3-turbo  hw=cpu-basic (dead cert)
   --   Imosu/LTX-2.3-turboX  hw=zero-a10g (dead cert)
   --   Artist89/wan2-video-generation  hw=cpu-basic (wake timeout)
-  --   Opera8/minimax-h3-audio-to-video  hw=cpu-basic (wake timeout)
-  --   TurboKyle/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
-  --   ChapouX/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
   --   AdamSongjam/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
   --   logeshr24/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
   --   adamnusic/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
@@ -66,41 +59,31 @@
   --   Menyudadas/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
   --   Velvetperil/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
   --   edwahh/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
-  --   avnigashi/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
+  I2V avnigashi/MiniMax-H3-Turbo-Lora  hw=zero-a10g fn=4 api=output_video gradio=6.23.1
+       params=[('textbox', 'Prompt'), ('image', 'First Frame (optional)'), ('image', 'Last Frame (optional)'), ('textbox', 'Canvas'), ('number', 'Duration (s)'), ('number', 'Steps'), ('number', 'Seed'), ('checkbox', 'Upsample Prompt'), ('textbox', 'LoRA')]
   --   paulo101977/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
   --   sitekf/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
-  --   tk29780930/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
-  --   eoboygamingrb/MiniMax-H3-Turbo-Lora  hw=RUNNING (HTTP 404)
-  --   RAGHURAMRAO/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
-  --   Sairockssss/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
-  --   Mamasita101/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
-  --   AlexCdDg/MiniMax-H3-Turbo-Lora  hw=zero-a10g gradio=6.20.0 (no video-output dep)
-  --   lbmodels/minimax-h3-ultra-fast  hw=zero-a10g (wake timeout)
-  --   Radiotomy/Nova-H3  hw=zero-a10g gradio=6.20.0 (no video-output dep)
-  --   Lampyy/MiniMax-H3-Turbo-Lora-Vid-Maker  hw=zero-a10g (wake timeout)
-  --   systemraquel/minimax-h3-ultra-fast  hw=zero-a10g (wake timeout)
-  --   jojobrentley/minimax-h3-ultra-fast  hw=zero-a10g (wake timeout)
-  --   abdullahhshafique/minimax-h3-ultra-fast  hw=zero-a10g (wake timeout)
-  --   Vyro909/MiniMax-H3-Turbo-Lora  hw=zero-a10g (wake timeout)
   discovery budget spent, stopping
 
-  discovered 14 video engines (10 i2v / 4 t2v)
+  discovered 12 video engines (8 i2v / 4 t2v)
 
 ==============================================================================
-### 2) anonymous minimal generation test (first 5, prefer non-zerogpu)
+### 2) anonymous minimal generation test (first 6, prefer non-zerogpu)
 ==============================================================================
-  GEN FAIL ysharma/gr-workflow-h3-zerogpu hw=zero-a10g kind=i2v: ERROR 'The requested GPU duration (362s) is larger than the maximum allowed'
-  GEN FAIL MiniMaxAI/MiniMax-H3-Turbo-Lora hw=zero-a10g kind=i2v: ERROR float() argument must be a string or a real number, not 'NoneType'
-  GEN FAIL akhaliq/MiniMax-H3-Turbo-Lora hw=zero-a10g kind=i2v: ERROR float() argument must be a string or a real number, not 'NoneType'
-  GEN FAIL abidlabs/MiniMax-H3-Turbo-Lora hw=zero-a10g kind=i2v: ERROR float() argument must be a string or a real number, not 'NoneType'
-  GEN FAIL zakirovrinatik/minimax-h3-audio-to-video hw=zero-a10g kind=i2v: ERROR A soundtrack is required.
+  GEN FAIL MiniMaxAI/MiniMax-H3-Turbo-Lora hw=zero-a10g kind=i2v: ERROR ''
+  GEN OK   akhaliq/MiniMax-H3-Turbo-Lora hw=zero-a10g kind=i2v in 42.9s cors='https://darthjarjar345.github.io' size=bytes 0-1023/819195
+  GEN FAIL abidlabs/MiniMax-H3-Turbo-Lora hw=zero-a10g kind=i2v: QUOTA 'You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  GEN FAIL hugging-apps/h3-world-action-demo hw=zero-a10g kind=i2v: QUOTA You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+  GEN FAIL DeepRat/LTX-Video-ZeroGPU-Optimized hw=zero-a10g kind=t2v: QUOTA You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+  GEN FAIL DeepRat/LTX-Video-ZeroGPU-Optimized hw=zero-a10g kind=i2v: QUOTA You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
 
 ==============================================================================
 ### SUMMARY — registry candidates
 ==============================================================================
-   - ysharma/gr-workflow-h3-zerogpu  hw=zero-a10g  fn=4  kind=i2v  api=video_soundtrack  verdict=ERROR    cors=None
    - MiniMaxAI/MiniMax-H3-Turbo-Lora  hw=zero-a10g  fn=4  kind=i2v  api=output_video  verdict=ERROR    cors=None
-   - akhaliq/MiniMax-H3-Turbo-Lora  hw=zero-a10g  fn=4  kind=i2v  api=output_video  verdict=ERROR    cors=None
-   - abidlabs/MiniMax-H3-Turbo-Lora  hw=zero-a10g  fn=4  kind=i2v  api=output_video  verdict=ERROR    cors=None
-   - zakirovrinatik/minimax-h3-audio-to-video  hw=zero-a10g  fn=3  kind=i2v  api=generate  verdict=ERROR    cors=None
+   - akhaliq/MiniMax-H3-Turbo-Lora  hw=zero-a10g  fn=4  kind=i2v  api=output_video  verdict=OK  42.9s  cors=https://darthjarjar345.github.io
+   - abidlabs/MiniMax-H3-Turbo-Lora  hw=zero-a10g  fn=4  kind=i2v  api=output_video  verdict=QUOTA    cors=None
+   - hugging-apps/h3-world-action-demo  hw=zero-a10g  fn=7  kind=i2v  api=generate  verdict=QUOTA    cors=None
+   - DeepRat/LTX-Video-ZeroGPU-Optimized  hw=zero-a10g  fn=6  kind=t2v  api=text_to_video  verdict=QUOTA    cors=None
+   - DeepRat/LTX-Video-ZeroGPU-Optimized  hw=zero-a10g  fn=7  kind=i2v  api=image_to_video  verdict=QUOTA    cors=None
 ```
