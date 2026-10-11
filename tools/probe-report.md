@@ -1,0 +1,192 @@
+# Space API probe report
+
+- run: 38155082507 / attempt 1
+- ref: arena/50b14632-reyloai
+- sha: dcc3f67cbb3d82b8b8153774ca3e7c3356f58fbe
+- utc: 2026-10-11T16:21:54Z
+
+```text
+Space : https://zerogpu-aoti-wan2-2-fp8da-aoti-faster.hf.space
+Origin: https://darthjarjar345.github.io
+Gens  : 4
+
+==============================================================================
+### 0) Public mirror content-type check (which URL is a REAL website?)
+==============================================================================
+  jsdelivr       HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>Reylo AI Video Generator \xe2\x80\x94 free AI image-to-video (Wa'
+  jsdelivr-htm   HTTP 404  content-type='text/plain; charset=utf-8'
+  statically     HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>Reylo AI Video Generator \xe2\x80\x94 free AI image-to-video (Wa'
+  githack-raw    HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE  interstitial=False  ours=True
+  githack-cdn    HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE  interstitial=False  ours=True
+  githack-apex   HTTP 200  content-type='text/html; charset=utf-8'  -> WEBSITE  interstitial=False  ours=True
+  gh-raw         HTTP 200  content-type='text/plain; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>Reylo AI Video Generator \xe2\x80\x94 free AI image-to-video (Wa'
+  githack-css    HTTP 200  content-type='text/css; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'/* ================================================================\n   Reylo AI Video Generator \xe2\x80\x94 design system\n   deep-space dark \xc2\xb7 dual-saber gradient (blue \xe2\x87\x84 red) \xc2\xb7 glass panels\n   =========='
+  githack-js     HTTP 200  content-type='application/javascript; charset=utf-8'  -> NOT-HTML  interstitial=False  ours=True
+      first bytes: b'/**\n * Reylo AI Video Generator \xe2\x80\x94 application logic.\n * 100% client-side: the browser talks straight to the Hugging Face Space\n * (Wan 2.2 14B Fast, ZeroGPU). No backend, no keys, no cost.\n */\n\nimpo'
+
+==============================================================================
+### 1) GET config (anonymous, browser Origin)
+==============================================================================
+  /gradio_api/config -> HTTP 404
+  config served at: /config
+  HTTP 200  api_prefix='/gradio_api' -> '/gradio_api'  protocol='sse_v3'  gradio=6.1.0
+  auth_required=None  space_id=zerogpu-aoti/wan2-2-fp8da-aoti-faster
+  access-control-allow-credentials: true
+  access-control-allow-origin: https://darthjarjar345.github.io
+  access-control-expose-headers: *
+    dep[0] api_name='generate_video' queue=True
+    dep[1] api_name='load_example_input' queue=False
+    dep[2] api_name='load_example' queue=True
+
+==============================================================================
+### 2) GET /gradio_api/info
+==============================================================================
+  HTTP 200  endpoints=['/generate_video']
+    /generate_video: visibility=public params=['input_image', 'prompt', 'steps', 'negative_prompt', 'duration_seconds', 'guidance_scale', 'guidance_scale_2', 'seed', 'randomize_seed']
+
+==============================================================================
+### 3) CORS preflights (queue/join + upload)
+==============================================================================
+  OPTIONS /queue/join -> HTTP 200  allow-origin='https://darthjarjar345.github.io'
+  OPTIONS /upload?upload_id=probe -> HTTP 200  allow-origin='https://darthjarjar345.github.io'
+
+==============================================================================
+### 4) 4 consecutive anonymous generations
+==============================================================================
+  gen#1: joined event_id=660119e34a9a4a79b5efb16d723deb59
+    [  0.3s] estimation rank=0 eta=45.777586723196094
+    [  0.3s] process_starts rank=None eta=45.777586723196094
+    [  1.2s] progress 10 desc=ZeroGPU init
+    [  1.7s] progress 20 desc=ZeroGPU init
+    [  2.2s] progress 21 desc=ZeroGPU init
+    [  2.3s] progress 22 desc=ZeroGPU init
+    [  2.3s] progress 23 desc=ZeroGPU init
+    [  2.3s] progress 24 desc=ZeroGPU init
+    [  2.3s] progress 25 desc=ZeroGPU init
+    [  2.4s] progress 26 desc=ZeroGPU init
+    [  2.4s] progress 27 desc=ZeroGPU init
+    [  2.4s] progress 28 desc=ZeroGPU init
+    [  2.4s] progress 29 desc=ZeroGPU init
+    [  2.5s] progress 30 desc=ZeroGPU init
+    [  2.5s] progress 31 desc=ZeroGPU init
+    [  2.5s] progress 32 desc=ZeroGPU init
+    [  2.6s] progress 33 desc=ZeroGPU init
+    [  2.6s] progress 34 desc=ZeroGPU init
+    [  2.7s] progress 35 desc=ZeroGPU init
+    [  2.7s] progress 36 desc=ZeroGPU init
+    [  2.7s] progress 37 desc=ZeroGPU init
+    [  2.8s] progress 38 desc=ZeroGPU init
+    [  2.9s] progress 39 desc=ZeroGPU init
+    [  2.9s] progress 40 desc=ZeroGPU init
+    [  3.0s] progress 41 desc=ZeroGPU init
+    [  3.0s] progress 42 desc=ZeroGPU init
+    [  3.1s] progress 43 desc=ZeroGPU init
+    [  3.1s] progress 44 desc=ZeroGPU init
+    [  3.2s] progress 45 desc=ZeroGPU init
+    [  3.3s] progress 46 desc=ZeroGPU init
+    [  3.3s] progress 47 desc=ZeroGPU init
+    [  3.4s] progress 48 desc=ZeroGPU init
+    [  3.4s] progress 49 desc=ZeroGPU init
+    [  3.5s] progress 50 desc=ZeroGPU init
+    [  3.6s] progress 51 desc=ZeroGPU init
+    [  3.6s] progress 52 desc=ZeroGPU init
+    [  3.7s] progress 53 desc=ZeroGPU init
+    [  3.7s] progress 54 desc=ZeroGPU init
+    [  3.8s] progress 55 desc=ZeroGPU init
+    [  3.8s] progress 56 desc=ZeroGPU init
+    [  3.9s] progress 57 desc=ZeroGPU init
+    [  4.0s] progress 58 desc=ZeroGPU init
+    [  4.0s] progress 59 desc=ZeroGPU init
+    [  4.1s] progress 60 desc=ZeroGPU init
+    [  4.1s] progress 61 desc=ZeroGPU init
+    [  4.2s] progress 62 desc=ZeroGPU init
+    [  4.2s] progress 63 desc=ZeroGPU init
+    [  4.3s] progress 64 desc=ZeroGPU init
+    [  4.3s] progress 65 desc=ZeroGPU init
+    [  4.4s] progress 66 desc=ZeroGPU init
+    [  4.5s] progress 67 desc=ZeroGPU init
+    [  4.5s] progress 68 desc=ZeroGPU init
+    [  4.6s] progress 69 desc=ZeroGPU init
+    [  4.6s] progress 70 desc=ZeroGPU init
+    [  4.7s] progress 71 desc=ZeroGPU init
+    [  4.8s] progress 72 desc=ZeroGPU init
+    [  4.9s] progress 73 desc=ZeroGPU init
+    [  4.9s] progress 74 desc=ZeroGPU init
+    [  5.0s] progress 75 desc=ZeroGPU init
+    [  5.1s] progress 76 desc=ZeroGPU init
+    [  5.2s] progress 77 desc=ZeroGPU init
+    [  5.2s] progress 78 desc=ZeroGPU init
+    [  5.3s] progress 79 desc=ZeroGPU init
+    [  5.4s] progress 80 desc=ZeroGPU init
+    [  5.6s] progress 81 desc=ZeroGPU init
+    [  5.7s] progress 82 desc=ZeroGPU init
+    [  5.7s] progress 83 desc=ZeroGPU init
+    [  5.8s] progress 84 desc=ZeroGPU init
+    [  5.9s] progress 85 desc=ZeroGPU init
+    [  6.0s] progress 86 desc=ZeroGPU init
+    [  6.0s] progress 87 desc=ZeroGPU init
+    [  6.1s] progress 88 desc=ZeroGPU init
+    [  6.2s] progress 89 desc=ZeroGPU init
+    [  6.3s] progress 90 desc=ZeroGPU init
+    [  6.3s] progress 91 desc=ZeroGPU init
+    [  6.4s] progress 92 desc=ZeroGPU init
+    [  6.5s] progress 93 desc=ZeroGPU init
+    [  6.6s] progress 94 desc=ZeroGPU init
+    [  6.7s] progress 95 desc=ZeroGPU init
+    [  6.8s] progress 96 desc=ZeroGPU init
+    [  6.9s] progress 97 desc=ZeroGPU init
+    [  7.0s] progress 98 desc=ZeroGPU init
+    [  7.0s] progress 99 desc=ZeroGPU init
+    [  7.1s] progress 100 desc=ZeroGPU init
+    [  7.1s] progress None desc=None
+    [  8.1s] progress 0 desc=None
+    [  8.8s] progress 1 desc=None
+    [  9.3s] progress 2 desc=None
+    [ 10.0s] progress 3 desc=None
+    [ 10.5s] progress None desc=None
+    [ 11.6s] process_completed success=None data_len=2 error='None'
+  gen#1: OK in 11.8s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#2: joined event_id=c9199b7009b84071b31e0a8ba69f12fa
+    [  0.3s] estimation rank=0 eta=45.39146423339844
+    [  0.3s] process_starts rank=None eta=45.39146423339844
+    [  0.8s] progress 0 desc=None
+    [  1.5s] progress 1 desc=None
+    [  2.0s] progress 2 desc=None
+    [  2.6s] progress 3 desc=None
+    [  3.1s] progress None desc=None
+    [  4.1s] process_completed success=None data_len=2 error='None'
+  gen#2: OK in 4.3s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#3: joined event_id=977213d762e14249a02222c2f9d8b65d
+    [  0.4s] estimation rank=0 eta=44.93080166975657
+    [  0.4s] process_starts rank=None eta=44.93080166975657
+    [  0.8s] progress 0 desc=None
+    [  1.4s] progress 1 desc=None
+    [  1.9s] progress 2 desc=None
+    [  2.5s] progress 3 desc=None
+    [  3.0s] progress None desc=None
+    [  4.1s] process_completed success=None data_len=2 error='None'
+  gen#3: OK in 4.3s · mp4 34846 bytes ct=video/mp4 cors='https://darthjarjar345.github.io'
+  gen#4: joined event_id=d22c34cb58164cc9b3cb2b8a45ad06c7
+    [  0.3s] estimation rank=0 eta=44.247658802115396
+    [  0.3s] process_starts rank=None eta=44.247658802115396
+    [  0.3s] process_completed success=None data_len=None error='You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens'
+  gen#4: NO VIDEO URL. full process_completed payload:
+    {"msg": "process_completed", "event_id": "d22c34cb58164cc9b3cb2b8a45ad06c7", "output": {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}, "success": false, "title": "ZeroGPU quota exceeded"}
+
+  generations succeeded: 3/4
+
+==============================================================================
+### SUMMARY
+==============================================================================
+FAILURES:
+  - jsdelivr serves index.html as non-HTML
+  - jsdelivr serves index.html as non-HTML
+  - gen#4 completed without video url
+  - only 3/4 generations succeeded
+```
+total 36
+-rw-r--r-- 1 runner runner 34846 Oct 11 16:21 probe_output.mp4

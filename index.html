@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reylo AI Video Generator — free AI image-to-video (Wan 2.2 14B Fast)</title>
+  <meta name="description" content="Turn any image — or just a prompt — into a cinematic AI video, free. Reylo AI Video Generator runs a fleet of open models on Hugging Face: Wan 2.2 14B Fast, MiniMax-H3 Turbo (video + synchronized audio) and LTX-2 Turbo — no account, no credits, no watermark.">
+  <meta name="theme-color" content="#05060a">
+  <link rel="canonical" href="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v4/index.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Reylo AI Video Generator">
+  <meta property="og:description" content="Free AI video in your browser — image-to-video with Wan 2.2 Fast, or video + synchronized audio with MiniMax-H3 Turbo & LTX-2 Turbo on Hugging Face.">
+  <meta property="og:url" content="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v4/index.html">
+  <meta property="og:image" content="https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v2/assets/samples/dune-wanderer.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="stars" aria-hidden="true"><canvas id="starfield"></canvas></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="Reylo AI home">
+      <svg viewBox="0 0 40 40" class="brand__mark" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#4cc9f0"/><stop offset=".5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ef233c"/>
+          </linearGradient>
+        </defs>
+        <circle cx="20" cy="20" r="17.5" fill="none" stroke="url(#lg1)" stroke-width="3"/>
+        <path d="M16 12.5 L28 20 L16 27.5 Z" fill="url(#lg1)"/>
+      </svg>
+      <span class="brand__text">REYLO<span class="brand__thin">AI</span></span>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#studio">Studio</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="pill" id="engine-pill" data-state="check" title="Live status of the Hugging Face Space">
+      <span class="dot" id="engine-dot"></span><span>Checking…</span>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============================== HERO ============================== -->
+    <section class="hero">
+      <p class="hero__kicker">Free forever · no account · no watermark</p>
+      <h1 class="hero__title">
+        Turn any image into<br>
+        <span class="hero__grad">living cinema.</span>
+      </h1>
+      <p class="hero__sub">
+        Reylo AI Video Generator animates your pictures with
+        <strong>Wan&nbsp;2.2&nbsp;14B&nbsp;Fast</strong> — the Lightning-LoRA, FP8-quantized,
+        AoT-compiled image-to-video model running free on Hugging&nbsp;Face ZeroGPU.
+        Everything happens in your browser; nothing is stored on our servers
+        (there are none).
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="#studio">Start generating — it's free</a>
+        <a class="btn btn--ghost" href="#how">How is this free?</a>
+      </div>
+      <ul class="hero__stats" aria-label="Engine specs">
+        <li><strong>Wan 2.2</strong><span>14B I2V engine</span></li>
+        <li><strong>4–8</strong><span>Lightning steps</span></li>
+        <li><strong>16 fps</strong><span>up to 5 s clips</span></li>
+        <li><strong>832×480</strong><span>cinematic 16:9</span></li>
+        <li><strong>$0</strong><span>always free</span></li>
+        <li><strong>∞</strong><span>fleet · 3 model families</span></li>
+      </ul>
+    </section>
+
+    <!-- ============================= STUDIO ============================= -->
+    <section class="studio" id="studio" aria-label="Video generation studio">
+      <div class="studio__head">
+        <h2>The Studio</h2>
+        <p>Pick a model, direct the motion, press generate. A rotating fleet of free engine
+           pools does the rest — if one pool runs dry for you, the next one takes over
+           automatically.</p>
+      </div>
+
+      <div class="modelpick" id="model-pick" role="radiogroup" aria-label="Model family">
+        <button type="button" class="modelpick__opt is-active" data-model="wan" role="radio" aria-checked="true">
+          <strong>Wan 2.2 Fast</strong>
+          <span>image → video · 16 fps · ~4–10s renders</span>
+        </button>
+        <button type="button" class="modelpick__opt" data-model="h3" role="radio" aria-checked="false">
+          <strong>MiniMax-H3 Turbo <em class="modelpick__new">new</em></strong>
+          <span>video + synced audio · image optional</span>
+        </button>
+        <button type="button" class="modelpick__opt" data-model="ltx" role="radio" aria-checked="false">
+          <strong>LTX Turbo <em class="modelpick__new">new</em></strong>
+          <span>fast distilled renders · image optional</span>
+        </button>
+      </div>
+      <p class="modelpick__note mono" id="model-note"></p>
+
+      <div class="studio__grid">
+        <!-- ------------------------------ input ------------------------------ -->
+        <div class="panel">
+          <div class="step">
+            <span class="step__n">01</span>
+            <h3 class="step__t" id="source-title">Source frame</h3>
+          </div>
+          <div class="dropzone" id="dropzone" role="button" tabindex="0"
+               aria-label="Upload an image: click, drag and drop, or paste">
+            <input type="file" id="file-input" accept="image/*" hidden>
+            <div class="dropzone__inner">
+              <svg viewBox="0 0 24 24" class="dropzone__icon" aria-hidden="true">
+                <path d="M12 16V4m0 0 4 4m-4-4L8 8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              </svg>
+              <p><strong>Drop an image</strong>, click to browse,<br>or paste from clipboard</p>
+              <p class="dropzone__hint">JPG · PNG · WebP — resized to 832 px locally before upload</p>
+            </div>
+            <div class="preview" id="preview" hidden>
+              <img id="preview-img" alt="Selected source image preview">
+              <div class="preview__bar">
+                <span id="preview-meta"></span>
+                <button type="button" id="replace-image" class="linklike">Replace</button>
+              </div>
+            </div>
+          </div>
+          <div class="samples" id="samples" aria-label="Sample images"></div>
+
+          <div class="step">
+            <span class="step__n">02</span>
+            <h3 class="step__t">Direct the motion</h3>
+          </div>
+          <div class="promptwrap">
+            <textarea id="prompt" rows="3" maxlength="500"
+              placeholder="e.g. The wanderer walks forward, cloak streaming in the wind, slow cinematic push-in…"></textarea>
+            <div class="promptwrap__meta">
+              <span id="prompt-count">0 chars</span>
+              <button type="button" id="surprise" class="linklike">🎲 surprise me</button>
+            </div>
+          </div>
+          <div class="chips" id="chips" aria-label="Motion presets"></div>
+
+          <details class="advanced" id="advanced-wrap">
+            <summary>Advanced settings</summary>
+            <div class="advanced__grid" id="advanced">
+              <label class="field">
+                <span>Duration <output id="duration-out"></output></span>
+                <input type="range" id="duration" min="0.5" max="5" step="0.1" value="3.5">
+              </label>
+              <label class="field">
+                <span>Inference steps <output id="steps-out"></output></span>
+                <input type="range" id="steps" min="1" max="30" step="1" value="6">
+              </label>
+              <label class="field">
+                <span>Guidance (high-noise) <output id="guidance-out"></output></span>
+                <input type="range" id="guidance" min="0" max="10" step="0.5" value="1">
+              </label>
+              <label class="field">
+                <span>Guidance 2 (low-noise) <output id="guidance2-out"></output></span>
+                <input type="range" id="guidance2" min="0" max="10" step="0.5" value="1">
+              </label>
+              <label class="field field--seed">
+                <span>Seed</span>
+                <div class="seedrow">
+                  <input type="number" id="seed" min="0" max="2147483647" step="1" value="42">
+                  <label class="check"><input type="checkbox" id="random-seed" checked> randomize</label>
+                </div>
+              </label>
+              <label class="field field--wide">
+                <span>Negative prompt</span>
+                <textarea id="negative" rows="2"></textarea>
+              </label>
+              <div class="field field--wide">
+                <span>Optional Hugging Face token <em>(only if you ever hit the shared-quota limit — your own free HF account lifts it)</em></span>
+                <div class="tokenrow">
+                  <input type="password" id="hf-token" placeholder="hf_… (stored only in this browser)" autocomplete="off">
+                  <button type="button" id="token-save" class="btn btn--tiny">Save</button>
+                  <button type="button" id="token-clear" class="btn btn--tiny btn--ghost">Clear</button>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div class="actions">
+            <button class="btn btn--primary btn--big" id="generate" type="button">
+              <span class="btn__label">Generate video</span>
+              <span class="btn__spinner" aria-hidden="true"></span>
+            </button>
+            <button class="btn btn--ghost" id="cancel" type="button" hidden>Cancel</button>
+          </div>
+          <p class="kbd-hint">tip: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> generates · <kbd>Ctrl</kbd>+<kbd>V</kbd> pastes an image</p>
+        </div>
+
+        <!-- ------------------------------ output ------------------------------ -->
+        <div class="panel panel--output">
+          <div class="stage" id="stage" data-mode="empty">
+            <video id="video" controls loop playsinline muted hidden></video>
+
+            <div class="stage__empty" id="stage-empty">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="2.5" y="5" width="14" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M16.5 10.5 21.5 7.5v9l-5-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M8 9.8v4.4l4-2.2z" fill="currentColor"/>
+              </svg>
+              <p>Your film premieres here.</p>
+              <span>Pick a frame on the left and press <strong>Generate</strong></span>
+            </div>
+
+            <div class="stage__busy" id="stage-busy" hidden>
+              <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r="52" class="ring__track"/>
+                <circle cx="60" cy="60" r="52" class="ring__bar" id="ring-circle"/>
+              </svg>
+              <p class="stage__status" id="status-main">Contacting the engine…</p>
+              <p class="stage__sub" id="status-sub">waking ZeroGPU if it was asleep</p>
+              <p class="stage__timer mono" id="timer">00:00</p>
+              <p class="stage__note">Free shared GPUs cold-start sometimes. Patience = cinema.</p>
+            </div>
+
+            <div class="stage__error" id="stage-error" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 2.5 20h19L12 3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M12 9.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="12" cy="17.2" r="1.1" fill="currentColor"/>
+              </svg>
+              <p id="error-text">Something went wrong.</p>
+              <p class="mono stage__countdown" id="quota-countdown" hidden></p>
+              <button class="btn btn--primary" id="error-retry" type="button">Try again</button>
+            </div>
+
+            <div class="stage__done" id="stage-done" hidden></div>
+          </div>
+
+          <div class="output-bar">
+            <span class="mono seed" id="seed-badge">seed —</span>
+            <span class="mono engine-badge" id="engine-badge" title="Which free engine served this clip">engine —</span>
+            <button class="btn btn--tiny audio-toggle" id="audio-toggle" type="button" hidden
+                    title="This clip has synchronized audio">🔇 Enable sound</button>
+            <div class="output-bar__btns">
+              <a class="btn btn--tiny" id="download" download="reylo-video.mp4" href="#">Download</a>
+              <button class="btn btn--tiny btn--ghost" id="save" type="button">Save to gallery</button>
+              <button class="btn btn--tiny btn--ghost" id="regen" type="button">↻ New take</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================= GALLERY ============================= -->
+    <section class="gallery" id="gallery" aria-label="Your local gallery">
+      <div class="gallery__head">
+        <div>
+          <h2>Your gallery</h2>
+          <p>Every take is stored <strong>only in this browser</strong> (IndexedDB) — private by design.
+             <span id="gallery-usage" class="mono"></span></p>
+        </div>
+        <button class="btn btn--tiny btn--ghost" id="gallery-clear" type="button">Clear all</button>
+      </div>
+      <p class="gallery__empty" id="gallery-empty">Nothing here yet — your generated videos will appear in this private, on-device gallery.</p>
+      <div class="gallery__grid" id="gallery-grid"></div>
+    </section>
+
+    <!-- =============================== HOW =============================== -->
+    <section class="how" id="how">
+      <h2>How is this 100% free?</h2>
+      <div class="how__grid">
+        <article class="card">
+          <span class="card__n">1</span>
+          <h3>Your browser is the server</h3>
+          <p>This site is a static page, published straight from this public repository to a free
+             public CDN mirror that renders it as a real website (with GitHub Pages
+             auto-provisioning wired in CI). It talks directly to the model over Hugging Face's
+             public Gradio API. There is no backend, no subscription, no credit-card wall
+             between you and the GPU.</p>
+        </article>
+        <article class="card">
+          <span class="card__n">2</span>
+          <h3>ZeroGPU donates the compute</h3>
+          <p>Hugging Face's ZeroGPU pool lends spare H200 time to public Spaces like
+             <em>Wan2.2 14B Fast</em>. Queues can form at peak hours — that's the only "cost":
+             a little patience.</p>
+        </article>
+        <article class="card">
+          <span class="card__n">3</span>
+          <h3>The engine is absurdly optimized</h3>
+          <p>Wan 2.2 14B image-to-video, distilled with the Lightning LoRA to 4–8 denoising steps,
+             FP8-quantized and ahead-of-time compiled (AoT) — so a clip that once took minutes
+             now renders in seconds of GPU time.</p>
+        </article>
+        <article class="card">
+          <span class="card__n">4</span>
+          <h3>Your data stays yours</h3>
+          <p>Images are resized in your browser and sent straight to the model; videos come back
+             and are cached only in your own browser's storage. No analytics, no accounts, no
+             tracking pixels.</p>
+        </article>
+
+        <article>
+          <h3>A fleet keeps it free for everyone</h3>
+          <p>Generation runs on a rotating fleet of free community GPU engines (Hugging Face
+             Spaces), reached directly from your browser — three model families: <strong>Wan 2.2
+             Fast</strong> (image→video), <strong>MiniMax-H3 Turbo</strong> (video + synchronized
+             stereo audio from text or an image) and <strong>LTX-2 Turbo</strong> (video + audio,
+             distilled fast renders). If one engine is down, asleep or momentarily full, the next
+             one in its family picks up automatically, and the CI in this repo continuously
+             validates and grows the fleet. Heavy back-to-back batches can exhaust the shared
+             free pool for a short window (~an hour) — the site shows a countdown and re-arms on
+             its own; an optional free Hugging Face token lifts even that.</p>
+        </article>
+      </div>
+      <p class="how__credit">
+        Engines: <a href="https://huggingface.co/spaces/zerogpu-aoti/wan2-2-fp8da-aoti-faster" rel="noopener" target="_blank">zerogpu-aoti/wan2-2-fp8da-aoti-faster</a> ·
+        <a href="https://huggingface.co/spaces/Upsampler/wan-2-2-14b-image-to-video" rel="noopener" target="_blank">Upsampler/wan-2-2-14b-image-to-video</a> ·
+        <a href="https://huggingface.co/spaces/Tinchote/wan-2-2-14b-image-to-video" rel="noopener" target="_blank">Tinchote/wan-2-2-14b-image-to-video</a> ·
+        <a href="https://huggingface.co/larryvrh/MiniMax-H3-Turbo-Lora" rel="noopener" target="_blank">MiniMax-H3 Turbo LoRA (larryvrh)</a> ·
+        <a href="https://huggingface.co/MiniMaxAI/MiniMax-H3" rel="noopener" target="_blank">MiniMaxAI/MiniMax-H3</a> ·
+        <a href="https://huggingface.co/spaces/amisima/LTX_2.5_Turbo_Studio" rel="noopener" target="_blank">LTX-2 Turbo spaces</a> ·
+        Weights: <a href="https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B" rel="noopener" target="_blank">Wan-AI/Wan2.2-I2V-A14B</a> (Apache-2.0) ·
+        LoRA: <a href="https://huggingface.co/Kijai/WanVideo_comfy/tree/main/Wan22-Lightning" rel="noopener" target="_blank">Wan22-Lightning</a>.
+        Reylo AI is an independent fan project and is not affiliated with Hugging Face or the model authors.
+      </p>
+    </section>
+
+    <!-- =============================== FAQ =============================== -->
+    <section class="faq" id="faq">
+      <h2>Questions, answered</h2>
+      <details><summary>Is it really free? What's the catch?</summary>
+        <p>Really free. The model runs on Hugging Face's free ZeroGPU quota for public Spaces.
+        The catch is purely practical: at busy times you wait in a shared queue, and very long
+        abuse sessions can hit a temporary quota cooldown. Wait a few minutes and it's back.</p>
+      </details>
+      <details><summary>Why does my first video take longer?</summary>
+        <p>The Space sleeps when idle. The first request of a while triggers a cold start
+        (1–2 minutes) before the GPU begins denoising. Reylo AI retries automatically and shows
+        live status while you wait.</p>
+      </details>
+      <details><summary>Text-to-video? Longer videos? HD?</summary>
+        <p>This engine is image-to-video: it animates a frame you give it (which is why results
+        stay coherent and beautiful). Clips run up to 5 seconds at 16 fps, 832×480. For
+        text-to-video, generate a still first with any free image model, then animate it here.</p>
+      </details>
+      <details><summary>Who owns the videos I make?</summary>
+        <p>You do — the Wan 2.2 weights are Apache-2.0 licensed. Please still respect the law and
+        people's rights: don't animate images you have no right to use.</p>
+      </details>
+      <details><summary>Where are my videos stored?</summary>
+        <p>In your own browser (IndexedDB), never on our side — this site has no server at all.
+        Clearing browser storage clears the gallery; use <em>Download</em> to keep a file.</p>
+      </details>
+      <details><summary>How is this "unlimited" if the free GPU pool has limits?</summary>
+        <p>Each free engine limits anonymous use <em>per visitor</em>, not per site. Reylo AI ships a
+        fleet of independent free engines and rotates them in your browser: when one pool taps out
+        for you, the next one silently takes over, and parked pools un-park automatically after
+        their cooldown. In practice that means you can keep generating long after any single pool
+        would have stopped you — and other visitors never consume your share.</p>
+      </details>
+      <details><summary>I hit a quota / auth error. Now what?</summary>
+        <p>Two free fixes: wait a few minutes for the shared pool to free up, or paste your own
+        free Hugging Face token in <em>Advanced settings</em> so the engine uses your personal
+        ZeroGPU quota instead of the anonymous one. The token never leaves your browser except
+        as an Authorization header to Hugging Face.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <p><strong>REYLO AI</strong> — video generator · <span id="year">2026</span></p>
+      <p>Made with the force, on Hugging Face ZeroGPU. Not affiliated with any film franchise;
+         "Reylo" is simply this project's name.</p>
+      <p class="footer__links">
+        <a href="https://github.com/DarthJarJar345/ReyloAI" rel="noopener" target="_blank">Source code</a> ·
+        <a href="https://github.com/DarthJarJar345/ReyloAI/releases" rel="noopener" target="_blank">Releases</a> ·
+        <a href="https://huggingface.co/spaces/zerogpu-aoti/wan2-2-fp8da-aoti-faster" rel="noopener" target="_blank">Engine Space</a> ·
+        <a href="#studio">Back to studio</a>
+      </p>
+    </div>
+  </footer>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="Video preview">
+    <div class="modal__box">
+      <button class="modal__close" id="modal-close" type="button" aria-label="Close">✕</button>
+      <video id="modal-video" controls loop playsinline></video>
+    </div>
+  </div>
+
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+name: Space API Probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_generate:
+        description: "Skip the full generation round-trip (CORS/config checks only)"
+        type: boolean
+        default: false
+  push:
+    paths:
+      - "tools/probe_space.py"
+      - ".github/workflows/probe.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: space-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run probe
+        id: probe
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ARGS=""
+          if [ "${{ inputs.skip_generate }}" = "true" ]; then ARGS="--skip-generate"; fi
+          python3 tools/probe_space.py $ARGS 2>&1 | tee probe.log
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Commit probe report back to the branch
+        if: always()
+        run: |
+          {
+            echo "# Space API probe report"
+            echo
+            echo "- run: ${{ github.run_id }} / attempt ${{ github.run_attempt }}"
+            echo "- ref: ${{ github.ref_name }}"
+            echo "- sha: ${{ github.sha }}"
+            echo "- utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo
+            echo '```text'
+            cat probe.log 2>/dev/null || echo "(no log produced)"
+            echo '```'
+          } > tools/probe-report.md
+          cp probe.log tools/probe.log 2>/dev/null || true
+          if [ -f probe_output.mp4 ]; then
+            mkdir -p tools/probe-artifacts
+            cp probe_output.mp4 tools/probe-artifacts/probe_output.mp4
+            ls -l tools/probe-artifacts/ >> tools/probe-report.md
+          fi
+          # ALWAYS publish the report as a commit comment first (reliable read channel)
+          python3 - <<'PY' || true
+          import json, os, subprocess, urllib.request
+          body = open("tools/probe-report.md").read()
+          sha = os.environ["GITHUB_SHA"]
+          repo = os.environ["GITHUB_REPOSITORY"]
+          token = os.environ["GITHUB_TOKEN"]
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/commits/{sha}/comments",
+              data=json.dumps({"body": body[:60000]}).encode(),
+              headers={"Authorization": f"Bearer {token}",
+                       "Accept": "application/vnd.github+json",
+                       "User-Agent": "probe-bot"},
+              method="POST")
+          try:
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  print("commit comment published:", r.status)
+          except Exception as e:
+              print("commit comment failed:", e)
+          PY
+          git config user.name "reylo-probe[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f tools/probe-report.md || true
+          git add -f tools/probe.log || true
+          git add -f tools/probe-artifacts || true
+          git commit -m "chore(probe): report from run ${{ github.run_id }}.${{ github.run_attempt }}" || echo "nothing to commit"
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" && echo "PUSH_OK" || echo "PUSH_FAILED"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

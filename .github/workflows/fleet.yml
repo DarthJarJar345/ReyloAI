@@ -1,0 +1,81 @@
+name: Fleet Probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/probe_fleet.py"
+      - "tools/probe_ms.py"
+      - ".github/workflows/fleet.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fleet-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: ModelScope second-pool probe
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python3 -u tools/probe_ms.py 2>&1 | tee ms.log
+
+      - name: Run fleet probe
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python3 -u tools/probe_fleet.py 2>&1 | tee fleet.log
+
+      - name: Publish fleet report
+        if: always()
+        run: |
+          {
+            echo "# Fleet probe report"
+            echo
+            echo "- run: ${{ github.run_id }}.${{ github.run_attempt }} · ref: ${{ github.ref_name }}"
+            echo "- utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo
+            echo '```text'
+            cat ms.log 2>/dev/null || echo "(no ms log)"
+            echo
+            cat fleet.log 2>/dev/null || echo "(no log)"
+            echo '```'
+          } > tools/fleet-report.md
+          git config user.name "reylo-probe[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f tools/fleet-report.md || true
+          git commit -m "chore(fleet): report from run ${{ github.run_id }}.${{ github.run_attempt }}" || echo "nothing to commit"
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}" && echo PUSH_OK || echo PUSH_FAILED
+          python3 - <<'PY' || true
+          import json, os, urllib.request
+          body = open("tools/fleet-report.md").read()
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/commits/{os.environ['GITHUB_SHA']}/comments",
+              data=json.dumps({"body": body[:60000]}).encode(),
+              headers={"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                       "Accept": "application/vnd.github+json",
+                       "User-Agent": "fleet-bot"},
+              method="POST")
+          try:
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  print("commit comment published:", r.status)
+          except Exception as e:
+              print("commit comment failed:", e)
+          PY
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

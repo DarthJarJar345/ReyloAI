@@ -1,0 +1,17 @@
+{
+  "name": "Reylo AI Video Generator",
+  "short_name": "Reylo AI",
+  "description": "Free AI image-to-video in your browser, powered by Wan 2.2 14B Fast on Hugging Face ZeroGPU.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#05060a",
+  "theme_color": "#05060a",
+  "icons": [
+    {
+      "src": "assets/img/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
