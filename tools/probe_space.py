@@ -35,15 +35,15 @@ UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
       "Chrome/126.0.0.0 Safari/537.36")
 
 MIRRORS = [
-    ("jsdelivr", "https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v3/index.html"),
-    ("jsdelivr-htm", "https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v3/index.htm"),
-    ("statically", "https://cdn.statically.io/gh/DarthJarJar345/ReyloAI/reylo-v3/index.html"),
-    ("githack-raw", "https://raw.githack.com/DarthJarJar345/ReyloAI/reylo-v3/index.html"),
-    ("githack-cdn", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v3/index.html"),
-    ("githack-apex", "https://githack.com/DarthJarJar345/ReyloAI/reylo-v3/index.html"),
-    ("gh-raw", "https://raw.githubusercontent.com/DarthJarJar345/ReyloAI/reylo-v3/index.html"),
-    ("githack-css", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v3/assets/css/style.css"),
-    ("githack-js", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v3/assets/js/app.js"),
+    ("jsdelivr", "https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v4/index.html"),
+    ("jsdelivr-htm", "https://cdn.jsdelivr.net/gh/DarthJarJar345/ReyloAI@reylo-v4/index.htm"),
+    ("statically", "https://cdn.statically.io/gh/DarthJarJar345/ReyloAI/reylo-v4/index.html"),
+    ("githack-raw", "https://raw.githack.com/DarthJarJar345/ReyloAI/reylo-v4/index.html"),
+    ("githack-cdn", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v4/index.html"),
+    ("githack-apex", "https://githack.com/DarthJarJar345/ReyloAI/reylo-v4/index.html"),
+    ("gh-raw", "https://raw.githubusercontent.com/DarthJarJar345/ReyloAI/reylo-v4/index.html"),
+    ("githack-css", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v4/assets/css/style.css"),
+    ("githack-js", "https://rawcdn.githack.com/DarthJarJar345/ReyloAI/reylo-v4/assets/js/app.js"),
 ]
 
 failures = []

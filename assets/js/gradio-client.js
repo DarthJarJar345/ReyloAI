@@ -222,8 +222,11 @@ export class GradioSpaceClient {
         continue;
       }
       if (/negative/.test(key)) out.push(settings.negative);
+      else if (p.comp === "checkbox" && /random|seed/.test(key)) out.push(settings.randomize);
+      else if (/seed/.test(key) && (p.comp === "number" || p.comp === "slider")) {
+        out.push(clamp(p, settings.seed));
+      }
       else if (/random/.test(key)) out.push(settings.randomize);
-      else if (/seed/.test(key)) out.push(clamp(p, settings.seed));
       else if (/step/.test(key)) out.push(clamp(p, settings.steps));
       else if (/audio/.test(key) && p.comp === "checkbox") out.push(p.def ?? true);
       else if (/duration|second|\(s\)/.test(key)) out.push(clamp(p, settings.duration));

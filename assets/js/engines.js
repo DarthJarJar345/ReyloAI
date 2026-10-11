@@ -65,11 +65,64 @@ export const ENGINES = [
     audio: false,
   },
   // ── MiniMax-H3 Turbo family (video+audio) — validated by tools/probe_h3.py ──
-  // __H3_ENGINES__
-  // ── LTX-2 Turbo family (video+audio) — validated by tools/probe_h3.py ──
-  // __LTX_ENGINES__
-  // ── non-ZeroGPU members (no platform quota) are appended automatically
-  //    by CI once the fleet probes prove them ─────────────────────────────
+  {
+    id: "h3-akhaliq",
+    host: "https://akhaliq-minimax-h3-turbo-lora.hf.space",
+    label: "MiniMax-H3 Turbo · pool A",
+    family: "h3",
+    fps: 24,
+    audio: true, // probe run 38153970761: GEN OK 42.9s, CORS ✓
+  },
+  {
+    id: "h3-official",
+    host: "https://minimaxai-minimax-h3-turbo-lora.hf.space",
+    label: "MiniMax-H3 Turbo · official",
+    family: "h3",
+    fps: 24,
+    audio: true,
+  },
+  {
+    id: "h3-abidlabs",
+    host: "https://abidlabs-minimax-h3-turbo-lora.hf.space",
+    label: "MiniMax-H3 Turbo · pool B",
+    family: "h3",
+    fps: 24,
+    audio: true,
+  },
+  {
+    id: "h3-world-action",
+    host: "https://hugging-apps-h3-world-action-demo.hf.space",
+    label: "MiniMax-H3 world-action",
+    family: "h3",
+    fps: 24,
+    audio: true,
+  },
+  // ── LTX family (fast distilled renders) — validated by tools/probe_h3.py ──
+  {
+    id: "ltx-deeprat",
+    host: "https://deeprat-ltx-video-zerogpu-optimized.hf.space",
+    label: "LTX-Video ZeroGPU",
+    family: "ltx",
+    fps: 24,
+    audio: false,
+  },
+  {
+    id: "ltx-bbox",
+    host: "https://yuvraj108c-ltx25-bbox-control-demo.hf.space",
+    label: "LTX-2.5 studio",
+    family: "ltx",
+    fps: 24,
+    audio: false,
+  },
+  // ── non-ZeroGPU members (no platform quota) ─────────────────────────────
+  {
+    id: "wan-openking-cpu",
+    host: "https://openking-wan2-video-generation.hf.space",
+    label: "Wan2 · slow CPU pool (no quota)",
+    family: "wan",
+    fps: 16,
+    audio: false, // hw=cpu-basic: immune to ZeroGPU quota, but renders take many minutes
+  },
 ];
 
 /** How long an engine stays parked after a failure kind (ms). */
