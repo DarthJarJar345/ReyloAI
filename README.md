@@ -42,12 +42,16 @@ no subscription and no credit-card wall anywhere in the loop.
 
 Free GPU pools limit anonymous use **per visitor IP**, not per site — and ZeroGPU's
 limit is platform-wide. Reylo AI therefore ships a **fleet** of independent free
-Gradio engines (`assets/js/engines.js`) and rotates them **in your browser**:
+Gradio engines (`assets/js/engines.js`) across **three model families** —
+**Wan 2.2 Fast** (image→video), **MiniMax-H3 Turbo** (video + synchronized stereo
+audio, from text *or* an image, via [larryvrh/MiniMax-H3-Turbo-Lora](https://huggingface.co/larryvrh/MiniMax-H3-Turbo-Lora))
+and **LTX Turbo** (fast distilled renders) — and rotates them **in your browser**:
 
 1. each generation tries the fleet in order (last good engine first);
 2. payloads are mapped **adaptively** from each space's own `/config`
-   (components + labels), so any Gradio I2V space can join without hand-written
-   adapters (`discoverI2V` / `buildI2VPayload` in `gradio-client.js`);
+   (components + labels), so any Gradio video space — image-to-video *or*
+   text-to-video, Wan / MiniMax-H3 / LTX alike — can join without hand-written
+   adapters (`discoverVideo(mode)` / `buildI2VPayload` in `gradio-client.js`);
 3. engines that quota-out, error, or sleep too long are **parked** in
    `localStorage` with a per-failure TTL and un-park automatically;
 4. when every pool is parked, the UI shows a **live refill countdown** and

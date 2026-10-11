@@ -24,16 +24,16 @@ export const MODEL_INFO = {
   },
   h3: {
     name: "MiniMax-H3 Turbo",
-    blurb: "video + synchronized stereo audio · 4–8 step sampling · image optional",
+    blurb: "video + synchronized stereo audio · renders take a few minutes · image optional",
     fps: 24,
     audio: true,
     needsImage: false,
   },
   ltx: {
-    name: "LTX-2 Turbo",
-    blurb: "video + audio · distilled fast renders · image optional",
+    name: "LTX Turbo",
+    blurb: "fast distilled renders · image optional",
     fps: 24,
-    audio: true,
+    audio: false,
     needsImage: false,
   },
 };
